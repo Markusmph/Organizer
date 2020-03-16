@@ -37,21 +37,22 @@ class Homework(Assignment):
         self.delivery_date = delivery_date
         self.perc_in_1hr = perc_in_1hr
         self.perc_completed = perc_completed
-        self.missing_per = 100 - self.perc_completed
         if recomended_date:
             self.recomended_date = self.delivery_date-dt.timedelta(1)
         else:
             self.recomended_date = recomended_date
-    def set_percentage_in1hr(self, perc):
-        self.percentage_in_1hr = perc
+    def set_perc_in1hr(self, perc):
+        self.perc_in_1hr = perc
     def set_completed(self, perc_completed):
         self.perc_completed = perc_completed
     def get_perc_in1hr(self):
-        return self.percentage_in_1hr
-    def get_missing_per(self):
-        return self.missing_per
+        return self.perc_in_1hr
+    def get_missing_perc(self):
+        return 100 - self.perc_completed
     def get_time_to_finish(self):
-        return (self.missing_per/self.perc_in_1hr)
+        return ((100 - self.perc_completed)/self.perc_in_1hr)
+    #def get_days_remaining(self):
+    #    return (self.delivery_date - dt.datetime.today())
 
 #class Exam(Assignment):
 #    def set_optional(self, optional):

@@ -12,6 +12,8 @@ class Ambit:
 class School(Ambit):
     def __init__(self, subj_list=[]):
         self.subj_list = subj_list
+    def set_subj_list(self, new_list):
+        self.subj_list = new_list
     def get_subj_list(self):
         return self.subj_list
 
@@ -33,8 +35,6 @@ class Subject:
         self.assignm_list = assignm_list
     def add_assignm(self, new_assignm):
         self.assignm_list.append(new_assignm)
-    def edit_assignm(self, index):
-        pass
     def remove_assignm(self, index):
         pass
     def set_hour(self, new_hour):
