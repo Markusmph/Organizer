@@ -90,17 +90,35 @@ def display_assignments():
 def dislpay_one(subj_index, assignm_index):
     i = int(subj_index) - 1
     j = int(assignm_index) - 1
-    assignment = school.get_subj_list()[i].get_assignments()[j]
-    print(assignment.get_name())
-    print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
-    print("     " + "Recomended date: " + str(assignment.get_recomended_date()))
-    print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
-    print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
-    print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
-    print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
-    #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
+    try:
+        assignment = school.get_subj_list()[i].get_assignments()[j]
+        print(assignment.get_name())
+        print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
+        print("     " + "Recomended date: " + str(assignment.get_recomended_date()))
+        print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
+        print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
+        print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
+        print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
+        #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
+    except IndexError:
+        print("That assignment doesn't exist!")
 def display_in_order():
-    pass
+    assignments = []
+    for subj in school.get_subj_list():
+        for assignm in subj.get_assignments():
+            assignments.append(assignm)
+
+    for i in range(1, len(list)):
+        j = i
+        while j < len(list):
+            if list[i-1] > list[j]:
+                (list[i-1], list[j]) = (list[j], list[i-1])
+                j = i
+            else:
+                j += 1
+    
+    for assignm in assignments:
+        print(str(assignm.get_delivery_date()))
     #assignments = []
     #assignments_dates = []
     #for subj in school.get_subj_list():
@@ -171,10 +189,24 @@ while True:
     run_instruc(get_input())
 
 
+
+
+# Sort without sorting method
+#-----------------------------------
+# def order_list(list):
+# for i in range(1, len(list)):
+#         j = i
+#         while j < len(list):
+#             if list[i-1] > list[j]:
+#                 (list[i-1], list[j]) = (list[j], list[i-1])
+#                 j = i
+#             else:
+#                 j += 1
+#     return list
+
     
 
 
-# TODO: save everything in files
 # TODO: set date of subject
 # TODO: set recomended date based on duration and delivery date
 # TODO: show to the user what to do
