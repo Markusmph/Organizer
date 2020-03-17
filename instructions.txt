@@ -10,7 +10,10 @@ edit pcomp <subject index> <assignment index> <new value> = change the percentag
 edit p1hr <subject index> <assignment index> <new value> = change the percentage of completion in one hour
 edit delivery <subject index> <assignment index> = change the delivery date of a specific assignment
 
-add hw <subject index>= add homework to specific subject
+add hw <subject index> = add homework to specific subject
+add n = add homework to natma
+
+rem n <index> = remove homework from natma
 
 q = exit program
 quit = exit program

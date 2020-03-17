@@ -1,14 +1,21 @@
 import datetime as dt
 import pickle as pk
 
-from Classes.Ambits import Ambit, School, Subject
+from Classes.Ambits import Ambit, School, Subject, Natma
 from Classes.Assignments import Assignment, Homework
 
 
 pickle_in = open("school.pickle", "rb")
 school = pk.load(pickle_in)
+pickle_in.close()
 
+pickle_in = open("natma.pickle", "rb")
+natma = pk.load(pickle_in)
+pickle_in.close()
 
+available_time_per_day = dt.timedelta(0, 0, 0, 0, 0, 4)
+
+today = dt.datetime.today()
 
 
 #----------------------------------------------------------------------------
@@ -28,10 +35,21 @@ def run_instruc(instruction):
     else:
         print("{0} is not a programmed instruction.".format(instruction[0]))
 
-def save_in_file():
+def save_in_school_file():
     pickle_out = open("school.pickle", "wb")
     pk.dump(school, pickle_out)
     pickle_out.close()
+
+def save_in_natma_file():
+    pickle_out = open("natma.pickle", "wb")
+    pk.dump(natma, pickle_out)
+    pickle_out.close()
+
+def decimal_to_time(value):
+    hours = int(value)
+    decimales = value - int(value)
+    minutes = decimales * 60
+    return (hours, minutes)
 
 
 
@@ -57,12 +75,18 @@ def display(instruction):
 
 def display_all():
     i = 1
+    print("--------------------- SCHOOL -----------------------------")
     for subject in school.get_subj_list():
         print(str(i) + ") " + subject.get_name())
         j = 1
         for assignm in subject.get_assignments():
-            print("     " + str(j) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "%")
+            print("     " + str(j) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "%" + " " + str(assignm.get_delivery_date()))
             j += 1
+        i += 1
+    print("--------------------- NATMA -----------------------------")
+    i = 1
+    for assignm in natma.get_assignm_list():
+        print(str(i) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "% " + str(assignm.get_delivery_date()))
         i += 1
 def display_subj():
     i = 1
@@ -95,6 +119,10 @@ def display_in_order():
     for subj in school.get_subj_list():
         for assignm in subj.get_assignments():
             assignments.append(assignm)
+
+    for assignm in natma.get_assignm_list():
+        assignments.append(assignm)
+
     for i in range(1, len(assignments)):
         j = i
         while j < len(assignments):
@@ -104,23 +132,34 @@ def display_in_order():
             else:
                 j += 1
     for assignm in assignments:
-        print("Delivery: " + str(assignm.get_delivery_date()) + " " + assignm.get_name())
+        (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
+        print("Delivery: " + str(assignm.get_delivery_date()) + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes")
 #----- display instruction ----
 
 #----- add instruction ----
 def add(instruction):
     noun_dict = {
-        "hw": add_homework
+        "hw": add_homework,
+        "n": add_natma
     }
     if instruction[0] in noun_dict:
-        noun_dict[instruction[0]](instruction[1])
+        noun = instruction[0]
+        del instruction[0]
+        noun_dict[noun](instruction)
     else:
         print("Please use a valid noun")
 def add_homework(subj_index):
-    delivery_date = dt.date(2020, int(input("Month of delivery: ")), int(input("Day of delivery: ")))
+    delivery_date = dt.date(today.year, int(input("Month of delivery: ")), int(input("Day of delivery: ")))
     assignment = Homework(input("Name: "), delivery_date)
     school.get_subj_list()[int(subj_index)-1].add_assignm(assignment)
-    save_in_file()
+    save_in_school_file()
+def add_natma(instruction):
+    name = input("Name: ")
+    delivery_date = dt.date(today.year, int(input("Month: ")), int(input("Day: ")))
+    perc1hr = float(input("Percentage in 1 hour: "))
+    new_assignm = Homework(name, delivery_date, perc1hr)
+    natma.add_assignm(new_assignm)
+    save_in_natma_file()
 #----- add instruction ----
 
 #----- edit instruction ----
@@ -142,30 +181,47 @@ def edit_name(instruction):
     assignm_index = instruction[1]
     value = instruction[2]
     school.get_subj_list()[int(subj_index)-1].get_assignments()[int(assignm_index)-1].set_name(value)
-    save_in_file()
+    save_in_school_file()
 def edit_perc_completed(instruction):
     subj_index = instruction[0]
     assignm_index = instruction[1]
     value = instruction[2]
     school.get_subj_list()[int(subj_index)-1].get_assignments()[int(assignm_index)-1].set_completed(float(value))
-    save_in_file()
+    if float(value) == 100:
+        school.get_subj_list()[int(subj_index)-1].set_as_completed(int(assignm_index)-1)
+    save_in_school_file()
 def edit_perc_1hr(instruction):
     subj_index = instruction[0]
     assignm_index = instruction[1]
     value = instruction[2]
     school.get_subj_list()[int(subj_index)-1].get_assignments()[int(assignm_index)-1].set_perc_in1hr(float(value))
-    save_in_file()
+    save_in_school_file()
 def edit_delivery_date(instruction):
     subj_index = instruction[0]
     assignm_index = instruction[1]
     delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
     school.get_subj_list()[int(subj_index)-1].get_assignments()[int(assignm_index)-1].set_delivery_date(delivery_date)
-    save_in_file()
+    save_in_school_file()
 #----- edit instruction ----
 
 #----- remove instruction ----
 def remove(instruction):
+    noun_dict = {
+        "s": remove_from_school,
+        "n": remove_from_natma
+    }
+    if instruction[0] in noun_dict:
+        noun = instruction[0]
+        del instruction[0]
+        noun_dict[noun](instruction)
+    else:
+        print("Please use a valid noun")
+def remove_from_school(instruction):
     pass
+def remove_from_natma(instruction):
+    i = int(instruction[0]) - 1
+    del natma.get_assignm_list()[i]
+    save_in_natma_file()
 #----- remove instruction ----
 
 

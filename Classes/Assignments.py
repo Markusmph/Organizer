@@ -16,6 +16,7 @@ class Assignment:
         self.duration = new_duration
     def set_delivery_date(self, new_delivery_date):
         self.delivery_date = new_delivery_date
+        self.recomended_date = new_delivery_date - dt.timedelta(1)
     def set_recomended_date(self, new_recomended_date):
         self.recomended_date = new_recomended_date
     def set_perc_completed(self, new_perc_completed):
@@ -30,6 +31,8 @@ class Assignment:
         return self.recomended_date
     def get_perc_completed(self):
         return self.perc_completed
+    def get_time_to_finish(self):
+        return ((100 - self.perc_completed)/self.perc_in_1hr)
 
 class Homework(Assignment):
     def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True):
