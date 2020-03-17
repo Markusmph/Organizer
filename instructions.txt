@@ -1,0 +1,17 @@
+
+disp = display each subject with its corresponding assignment
+disp assignm = display all assignments with its corresponding subject
+disp subj = display all subjects
+disp inor = display all assignments in order of delivery date
+disp <subject index> <assignment index> = display the information of an individual assignment
+
+edit name <subject index> <assignment index> <new name> = change name of a specific assignment
+edit pcomp <subject index> <assignment index> <new value> = change the percentage of the completion of a specific assignment
+edit p1hr <subject index> <assignment index> <new value> = change the percentage of completion in one hour
+edit delivery <subject index> <assignment index> = change the delivery date of a specific assignment
+
+add hw <subject index>= add homework to specific subject
+
+q = exit program
+quit = exit program
+exit = exit program
