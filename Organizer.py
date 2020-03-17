@@ -5,22 +5,36 @@ from Classes.Ambits import Ambit, School, Subject, Natma
 from Classes.Assignments import Assignment, Homework
 
 
-pickle_in = open("school.pickle", "rb")
-school = pk.load(pickle_in)
-pickle_in.close()
-
-pickle_in = open("natma.pickle", "rb")
-natma = pk.load(pickle_in)
-pickle_in.close()
-
-available_time_per_day = dt.timedelta(0, 0, 0, 0, 0, 4)
-
-today = dt.datetime.today()
+# for subj in school.get_subj_list():
+#     for assignm in subj.get_assignments():
+#         assignm.set_mandatory(True)
+# for assignm in natma.get_assignm_list():
+#     assignm.set_mandatory(True)
 
 
 #----------------------------------------------------------------------------
 # User interaction
 
+
+#----- files ----
+def read_files():
+    pickle_in = open("school.pickle", "rb")
+    school = pk.load(pickle_in)
+    pickle_in.close()
+    pickle_in = open("natma.pickle", "rb")
+    natma = pk.load(pickle_in)
+    pickle_in.close()
+    return (school, natma)
+
+def save_in_school_file():
+    pickle_out = open("school.pickle", "wb")
+    pk.dump(school, pickle_out)
+    pickle_out.close()
+
+def save_in_natma_file():
+    pickle_out = open("natma.pickle", "wb")
+    pk.dump(natma, pickle_out)
+    pickle_out.close()
 
 
 def get_input():
@@ -35,22 +49,22 @@ def run_instruc(instruction):
     else:
         print("{0} is not a programmed instruction.".format(instruction[0]))
 
-def save_in_school_file():
-    pickle_out = open("school.pickle", "wb")
-    pk.dump(school, pickle_out)
-    pickle_out.close()
-
-def save_in_natma_file():
-    pickle_out = open("natma.pickle", "wb")
-    pk.dump(natma, pickle_out)
-    pickle_out.close()
-
 def decimal_to_time(value):
     hours = int(value)
     decimales = value - int(value)
     minutes = decimales * 60
     return (hours, minutes)
 
+def update_deliveries():
+    for subj in school.get_subj_list():
+        for assignm in subj.get_assignments():
+            if assignm.get_delivery_date() < today.date() and not assignm.get_mandatory():
+                assignm.set_delivery_date(today.date())
+    for assignm in natma.get_assignm_list():
+        if assignm.get_delivery_date() < today.date() and not assignm.get_mandatory():
+            assignm.set_delivery_date(today.date())
+    save_in_school_file()
+    save_in_natma_file()
 
 
 
@@ -116,24 +130,32 @@ def dislpay_one(subj_index, assignm_index):
         print("That assignment doesn't exist!")
 def display_in_order():
     assignments = []
+    subject_name = []
     for subj in school.get_subj_list():
         for assignm in subj.get_assignments():
             assignments.append(assignm)
+            subject_name.append(subj.get_name())
 
     for assignm in natma.get_assignm_list():
         assignments.append(assignm)
+        subject_name.append("Natma")
 
     for i in range(1, len(assignments)):
         j = i
         while j < len(assignments):
             if assignments[i-1].get_delivery_date() > assignments[j].get_delivery_date():
                 (assignments[i-1], assignments[j]) = (assignments[j], assignments[i-1])
+                (subject_name[i-1], subject_name[j]) = (subject_name[j], subject_name[i-1])
                 j = i
             else:
                 j += 1
+    i = 0
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
-        print("Delivery: " + str(assignm.get_delivery_date()) + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes")
+        delivery = str(assignm.get_delivery_date())
+        text = "Delivery: " + delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i]
+        print(text)
+        i += 1
 #----- display instruction ----
 
 #----- add instruction ----
@@ -170,7 +192,9 @@ def edit(instruction):
         "name": edit_name,
         "pcomp": edit_perc_completed,
         "p1hr": edit_perc_1hr,
-        "delivery": edit_delivery_date
+        "delivery": edit_delivery_date,
+        "mand": edit_mandatory,
+        "nmand": edit_mandatory_natma
     }
     if noun in noun_dict:
         noun_dict[noun](instruction)
@@ -188,7 +212,13 @@ def edit_perc_completed(instruction):
     value = instruction[2]
     school.get_subj_list()[int(subj_index)-1].get_assignments()[int(assignm_index)-1].set_completed(float(value))
     if float(value) == 100:
-        school.get_subj_list()[int(subj_index)-1].set_as_completed(int(assignm_index)-1)
+        try:
+            school.get_subj_list()[int(subj_index)-1].set_as_completed(int(assignm_index)-1)
+        except AttributeError:
+            print("Subject has no attribute completed, creating one...")
+            school.get_subj_list()[int(subj_index)-1].create_completed_list()
+            school.get_subj_list()[int(subj_index)-1].set_as_completed(int(assignm_index)-1)
+            print("Completed list created!")
     save_in_school_file()
 def edit_perc_1hr(instruction):
     subj_index = instruction[0]
@@ -201,6 +231,17 @@ def edit_delivery_date(instruction):
     assignm_index = instruction[1]
     delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
     school.get_subj_list()[int(subj_index)-1].get_assignments()[int(assignm_index)-1].set_delivery_date(delivery_date)
+    save_in_school_file()
+def edit_mandatory(instruction):
+    subj_index = instruction[0]
+    assignm_index = instruction[1]
+    new_value = instruction[2]
+    school.get_subj_list()[int(subj_index)-1].get_assignments()[int(assignm_index)-1].set_mandatory(new_value)
+    save_in_school_file()
+def edit_mandatory_natma(instruction):
+    assignm_index = instruction[0]
+    new_value = instruction[1]
+    natma.get_assignm_list()[int(assignm_index)-1].set_mandatory(new_value)
     save_in_school_file()
 #----- edit instruction ----
 
@@ -236,11 +277,12 @@ verb_dict = {
     "exit": exit
 }
 
-
-
+(school, natma) = read_files()
+available_time_per_day = dt.timedelta(0, 0, 0, 0, 0, 4)
+today = dt.datetime.today()
+update_deliveries()
 while True:
     run_instruc(get_input())
-
 
 
 
@@ -257,9 +299,8 @@ while True:
 #                 j += 1
 #     return list
 
-
-
-
+# TODO: if a mandatory assignment is late, set it as late
 # TODO: set date of subject
 # TODO: set recomended date based on duration and delivery date
 # TODO: show to the user what to do
+# TODO: create gui

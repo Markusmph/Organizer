@@ -35,11 +35,12 @@ class Assignment:
         return ((100 - self.perc_completed)/self.perc_in_1hr)
 
 class Homework(Assignment):
-    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True):
+    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory=True):
         self.name = name
         self.delivery_date = delivery_date
         self.perc_in_1hr = perc_in_1hr
         self.perc_completed = perc_completed
+        self.mandatory = mandatory
         if recomended_date:
             self.recomended_date = self.delivery_date-dt.timedelta(1)
         else:
@@ -48,12 +49,44 @@ class Homework(Assignment):
         self.perc_in_1hr = perc
     def set_completed(self, perc_completed):
         self.perc_completed = perc_completed
+    def set_mandatory(self, mandatory):
+        self.mandatory = mandatory
     def get_perc_in1hr(self):
         return self.perc_in_1hr
     def get_missing_perc(self):
         return 100 - self.perc_completed
     def get_time_to_finish(self):
         return ((100 - self.perc_completed)/self.perc_in_1hr)
+    def get_mandatory(self):
+        return self.mandatory
+    #def get_days_remaining(self):
+    #    return (self.delivery_date - dt.datetime.today())
+
+# class PersAssignment(Assignment):
+#     def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory=True):
+#         self.name = name
+#         self.delivery_date = delivery_date
+#         self.perc_in_1hr = perc_in_1hr
+#         self.perc_completed = perc_completed
+#         self.mandatory = mandatory
+#         if recomended_date:
+#             self.recomended_date = self.delivery_date-dt.timedelta(1)
+#         else:
+#             self.recomended_date = recomended_date
+#     def set_perc_in1hr(self, perc):
+#         self.perc_in_1hr = perc
+#     def set_completed(self, perc_completed):
+#         self.perc_completed = perc_completed
+#     def set_mandatory(self, mandatory):
+#         self.mandatory = mandatory
+#     def get_perc_in1hr(self):
+#         return self.perc_in_1hr
+#     def get_missing_perc(self):
+#         return 100 - self.perc_completed
+#     def get_time_to_finish(self):
+#         return ((100 - self.perc_completed)/self.perc_in_1hr)
+#     def get_mandatory(self):
+#         return self.mandatory
     #def get_days_remaining(self):
     #    return (self.delivery_date - dt.datetime.today())
 

@@ -9,6 +9,8 @@ edit name <subject index> <assignment index> <new name> = change name of a speci
 edit pcomp <subject index> <assignment index> <new value> = change the percentage of the completion of a specific assignment
 edit p1hr <subject index> <assignment index> <new value> = change the percentage of completion in one hour
 edit delivery <subject index> <assignment index> = change the delivery date of a specific assignment
+edit mand <subject index> <assignment index> <boolean mandatory value> = change the mandatory value (boolean which determines if a homework has to be delivered or not)
+edit nmand <assignment index> <boolean mandatory value> = change the mandatory value of a natma homework
 
 add hw <subject index> = add homework to specific subject
 add n = add homework to natma

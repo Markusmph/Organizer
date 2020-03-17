@@ -12,6 +12,8 @@ class Ambit:
 class School(Ambit):
     def __init__(self, subj_list=[]):
         self.subj_list = subj_list
+    def add_subj(self, new_subj):
+        self.subj_list.append(new_subj)
     def set_subj_list(self, new_list):
         self.subj_list = new_list
     def get_subj_list(self):
@@ -26,11 +28,17 @@ class Natma(Ambit):
         self.assignm_list = new_list
     def get_assignm_list(self):
         return self.assignm_list
-#
-#class Personal(Ambit):
-#    def __init__(self, categ_list=[]):
-#        self.list = categ_list
-#        pass
+
+class Personal(Ambit):
+    def __init__(self, categ_list=[]):
+        self.categ_list = categ_list
+    def add_categ(self, new_categ):
+        self.categ_list.append(new_categ)
+    def set_categ_list(self, new_list):
+        self.categ_list = new_list
+    def get_categ_list(self):
+        return self.categ_list
+    
 ##------------------------------------------------------
 #
 ##------------------------------------------------------
@@ -45,6 +53,8 @@ class Subject:
         pass
     def set_hour(self, new_hour):
         pass
+    def create_completed_list(self):
+        self.completed = []
     def set_as_completed(self, index):
         self.completed.append(self.assignm_list[index])
         del self.assignm_list[index]
@@ -54,8 +64,10 @@ class Subject:
         return self.hour
     def get_assignments(self):
         return self.assignm_list
-#
-#class Category:
-#    def __init__(self):
-#        pass
-##------------------------------------------------------
+
+class Category:
+   def __init__(self, name, assignm_list=[]):
+       self.name = name
+       self.assignm_list = assignm_list
+       self.completed = []
+# ------------------------------------------------------
