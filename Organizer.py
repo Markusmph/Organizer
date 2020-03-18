@@ -58,10 +58,13 @@ def decimal_to_time(value):
 def update_deliveries():
     for subj in school.get_subj_list():
         for assignm in subj.get_assignments():
-            if assignm.get_delivery_date() < today.date() and not assignm.get_mandatory():
+            mandatory = assignm.get_mandatory() == "False"
+            #print(str(assignm.get_delivery_date()) + " " + str(assignm.get_delivery_date() < today.date()) + " {0}".format(mandatory))
+            if assignm.get_delivery_date() < today.date() and mandatory:
                 assignm.set_delivery_date(today.date())
     for assignm in natma.get_assignm_list():
-        if assignm.get_delivery_date() < today.date() and not assignm.get_mandatory():
+        mandatory = assignm.get_mandatory() == "False"
+        if assignm.get_delivery_date() < today.date() and mandatory:
             assignm.set_delivery_date(today.date())
     save_in_school_file()
     save_in_natma_file()
@@ -125,6 +128,7 @@ def dislpay_one(subj_index, assignm_index):
         print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
         print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
         print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
+        print("     " + "Mandatory: " + str(assignment.get_mandatory()))
         #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
     except IndexError:
         print("That assignment doesn't exist!")
@@ -170,7 +174,8 @@ def add(instruction):
         noun_dict[noun](instruction)
     else:
         print("Please use a valid noun")
-def add_homework(subj_index):
+def add_homework(instruction):
+    subj_index = instruction[0]
     delivery_date = dt.date(today.year, int(input("Month of delivery: ")), int(input("Day of delivery: ")))
     assignment = Homework(input("Name: "), delivery_date)
     school.get_subj_list()[int(subj_index)-1].add_assignm(assignment)

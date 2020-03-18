@@ -40,7 +40,6 @@ class Homework(Assignment):
         self.delivery_date = delivery_date
         self.perc_in_1hr = perc_in_1hr
         self.perc_completed = perc_completed
-        self.mandatory = mandatory
         if recomended_date:
             self.recomended_date = self.delivery_date-dt.timedelta(1)
         else:
@@ -50,7 +49,12 @@ class Homework(Assignment):
     def set_completed(self, perc_completed):
         self.perc_completed = perc_completed
     def set_mandatory(self, mandatory):
-        self.mandatory = mandatory
+        if mandatory == "True":
+            self.mandatory = True
+        elif mandatory == "False":
+            self.mandatory = False
+        else:
+            raise ValueError
     def get_perc_in1hr(self):
         return self.perc_in_1hr
     def get_missing_perc(self):
