@@ -60,16 +60,23 @@ def decimal_to_time(value):
     return (hours, minutes)
 
 def update_deliveries():
+    # School
     for subj in school.get_subj_list():
         for assignm in subj.get_assignm_list():
             mandatory = assignm.get_mandatory()
             #print(str(assignm.get_delivery_date()) + " " + str(assignm.get_delivery_date() < today.date()) + " {0}".format(mandatory))
-            if assignm.get_delivery_date() < today.date() and mandatory:
+            if assignm.get_delivery_date() < today.date() and not mandatory:
                 assignm.set_delivery_date(today.date())
+            elif assignm.get_delivery_date() < today.date() and mandatory:
+                assignm.set_late(True)
+    # Natma
     for assignm in natma.get_assignm_list():
         mandatory = assignm.get_mandatory()
-        if assignm.get_delivery_date() < today.date() and mandatory:
+        if assignm.get_delivery_date() < today.date() and not mandatory:
             assignm.set_delivery_date(today.date())
+        elif assignm.get_delivery_date() < today.date() and mandatory:
+            assignm.set_late(True)
+
     save_files()
 
 def ordered_list():
@@ -168,7 +175,16 @@ def display_in_order():
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
         delivery = str(assignm.get_delivery_date())
-        text = "Delivery: " + delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i]
+        if type(assignm) == Assignment:
+            if assignm.get_late():
+                late = " LATE"
+            else:
+                late = ""
+        else:
+            late = ""
+            
+        text = "Delivery: " + delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i] + late
+            
         print(text)
         i += 1
         try:
@@ -364,9 +380,20 @@ verb_dict = {
 (school, natma) = read_files()
 available_time_per_day = dt.timedelta(0, 0, 0, 0, 0, 4)
 today = dt.datetime.today()
-update_deliveries()
+#update_deliveries()
 while True:
     run_instruc(get_input())
+
+
+
+# for subj in school.get_subj_list():
+#     for assignm in subj.get_assignm_list():
+#         if type(assignm) == Assignment:
+#             assignm.set_late(False)
+
+# for assignm in natma.get_assignm_list():
+#     if type(assignm) == Assignment:
+#             assignm.set_late(False)
 
 
 # Sort without sorting method

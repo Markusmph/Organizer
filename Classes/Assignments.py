@@ -42,12 +42,15 @@ class Homework(Assignment):
         else:
             self.recomended_date = recomended_date
         self.mandatory = mandatory
+        self.late = False
     def set_perc_in1hr(self, perc):
         self.perc_in_1hr = perc
     def set_completed(self, perc_completed):
         self.perc_completed = perc_completed
     def set_mandatory(self, mandatory):
         self.mandatory = mandatory
+    def set_late(self, late):
+        self.late = late
     def get_perc_in1hr(self):
         return self.perc_in_1hr
     def get_missing_perc(self):
@@ -56,6 +59,8 @@ class Homework(Assignment):
         return ((100 - self.perc_completed)/self.perc_in_1hr)
     def get_mandatory(self):
         return self.mandatory
+    def get_late(self):
+        return self.late
     #def get_days_remaining(self):
     #    return (self.delivery_date - dt.datetime.today())
 
