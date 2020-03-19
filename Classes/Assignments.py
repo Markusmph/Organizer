@@ -32,7 +32,7 @@ class Assignment:
         return ((100 - self.perc_completed)/self.perc_in_1hr)
 
 class Homework(Assignment):
-    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory="True"):
+    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory=True):
         self.name = name
         self.delivery_date = delivery_date
         self.perc_in_1hr = perc_in_1hr
@@ -41,23 +41,13 @@ class Homework(Assignment):
             self.recomended_date = self.delivery_date-dt.timedelta(1)
         else:
             self.recomended_date = recomended_date
-        if mandatory == "True" or mandatory == "true":
-            self.mandatory = True
-        elif mandatory == "False" or mandatory == "false":
-            self.mandatory == False
-        else:
-            raise ValueError
+        self.mandatory = mandatory
     def set_perc_in1hr(self, perc):
         self.perc_in_1hr = perc
     def set_completed(self, perc_completed):
         self.perc_completed = perc_completed
     def set_mandatory(self, mandatory):
-        if mandatory == "True":
-            self.mandatory = True
-        elif mandatory == "False":
-            self.mandatory = False
-        else:
-            raise ValueError
+        self.mandatory = mandatory
     def get_perc_in1hr(self):
         return self.perc_in_1hr
     def get_missing_perc(self):

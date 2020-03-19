@@ -124,7 +124,7 @@ def display_all():
         print(str(i) + ") " + subject.get_name())
         j = 1
         for assignm in subject.get_assignm_list():
-            print("     " + str(j) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "%" + " " + str(assignm.get_delivery_date()))
+            print("     " + str(j) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "%" + " " + str(assignm.get_delivery_date()) + " " + str(assignm.get_mandatory()))
             j += 1
         i += 1
     print("--------------------- NATMA -----------------------------")
@@ -163,6 +163,8 @@ def dislpay_one(subj_index, assignm_index):
 def display_in_order():
     (assignments, subject_name) = ordered_list()
     i = 0
+    assignments.reverse()
+    subject_name.reverse()
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
         delivery = str(assignm.get_delivery_date())
@@ -271,19 +273,25 @@ def edit_delivery_date(instruction):
 def edit_mandatory(instruction):
     subj_index = instruction[0]
     assignm_index = instruction[1]
-    new_value = instruction[2]
-    try:
-        school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_mandatory(new_value)
-    except ValueError:
-        print("Please enter true or false")
+    if instruction[2] == "True" or instruction[2] == "true" or instruction[2] == "t":
+        new_value = True
+    elif instruction[2] == "False" or instruction[2] == "false" or instruction[2] == "f":
+        new_value = False
+    else:
+        print("Setting value as True")
+        new_value = True
+    school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_mandatory(new_value)
     save_in_school_file()
 def edit_mandatory_natma(instruction):
     assignm_index = instruction[0]
-    new_value = instruction[1]
-    try:
-        natma.get_assignm_list()[int(assignm_index)-1].set_mandatory(new_value)
-    except ValueError:
-        print("Please enter true or false")
+    if instruction[1] == "True" or instruction[1] == "true" or instruction[1] == "t":
+        new_value = True
+    elif instruction[1] == "False" or instruction[1] == "false" or instruction[1] == "f":
+        new_value = False
+    else:
+        print("Setting value as True")
+        new_value = True
+    natma.get_assignm_list()[int(assignm_index)-1].set_mandatory(new_value)
     save_in_natma_file()
 #----- edit instruction ----
 
@@ -320,12 +328,25 @@ def remaining_hrs(instruction):
     
     (assignments, subj_name) = ordered_list()
 
-    time_remaining = 0
+    time_total = 0
+    time_mandatory = 0
+    time_non_mandatory = 0
     for assignm in assignments:
         if assignm.get_delivery_date() <= dt.date(today.year, month, day):
-            time_remaining += assignm.get_time_to_finish()
-    (hours, minutes) = decimal_to_time(time_remaining)
-    print("Time remaining to complete assignments until " + str(day) + " of " + str(month) + ": " + str(hours) + " hours " + str(minutes) + " minutes")
+            if assignm.get_mandatory():
+                time_mandatory += assignm.get_time_to_finish()
+            elif not assignm.get_mandatory():
+                time_non_mandatory += assignm.get_time_to_finish()
+    time_total = time_mandatory + time_non_mandatory
+    (hours_mandatory, minutes_mandatory) = decimal_to_time(time_mandatory)
+    (hours_non_mandatory, minutes_non_mandatory) = decimal_to_time(time_non_mandatory)
+    (hours_total, minutes_total) = decimal_to_time(time_total)
+    print("Time remaining to complete assignments until " + str(day) + " of " + str(month))
+    print("............................................................................................")
+    print("Mandatory assignments: " + str(hours_mandatory) + " hours " + str(minutes_mandatory) + " minutes")
+    print("Non-mandatory assignments: " + str(hours_non_mandatory) + " hours " + str(minutes_non_mandatory) + " minutes")
+    print("Total: " + str(hours_total) + " hours " + str(minutes_total) + " minutes")
+
 #----- remaining hours ----
 
 
@@ -346,7 +367,6 @@ today = dt.datetime.today()
 update_deliveries()
 while True:
     run_instruc(get_input())
-
 
 
 # Sort without sorting method
