@@ -1,15 +1,12 @@
 import datetime as dt
 
 class Assignment:
-    def __init__(self, name, delivery_date, duration, perc_completed=0, recomended_date=True):
+    def __init__(self, name, delivery_date, duration, perc_completed=0):
         self.name = name
         self.duration = duration
         self.delivery_date = delivery_date
         self.perc_completed = perc_completed
-        if recomended_date:
-            self.recomended_date = self.delivery_date-dt.timedelta(1)
-        else:
-            self.recomended_date = recomended_date
+        self.recomended_date = self.delivery_date-dt.timedelta(1)
     def set_name(self, new_name):
         self.name = new_name
     def set_duration(self, new_duration):
@@ -35,7 +32,7 @@ class Assignment:
         return ((100 - self.perc_completed)/self.perc_in_1hr)
 
 class Homework(Assignment):
-    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory=True):
+    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory="True"):
         self.name = name
         self.delivery_date = delivery_date
         self.perc_in_1hr = perc_in_1hr
@@ -44,6 +41,12 @@ class Homework(Assignment):
             self.recomended_date = self.delivery_date-dt.timedelta(1)
         else:
             self.recomended_date = recomended_date
+        if mandatory == "True" or mandatory == "true":
+            self.mandatory = True
+        elif mandatory == "False" or mandatory == "false":
+            self.mandatory == False
+        else:
+            raise ValueError
     def set_perc_in1hr(self, perc):
         self.perc_in_1hr = perc
     def set_completed(self, perc_completed):
@@ -65,6 +68,23 @@ class Homework(Assignment):
         return self.mandatory
     #def get_days_remaining(self):
     #    return (self.delivery_date - dt.datetime.today())
+
+class Exam(Assignment):
+    def __init__(self, name, delivery_date, time_to_study=2, perc_completed=0):
+        self.name = name
+        self.delivery_date = delivery_date
+        self.time_to_study = time_to_study
+        self.perc_completed = perc_completed
+        self.study_date = self.delivery_date-dt.timedelta(1)
+    def set_time_to_study(self, time_to_study):
+        self.time_to_study = time_to_study
+    def get_time_to_study(self):
+        return self.get_time_to_study
+    def get_mandatory(self):
+        return True
+    def get_time_to_finish(self):
+        return self.time_to_study - self.perc_completed*self.time_to_study/100
+
 
 # class PersAssignment(Assignment):
 #     def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory=True):
@@ -93,12 +113,6 @@ class Homework(Assignment):
 #         return self.mandatory
     #def get_days_remaining(self):
     #    return (self.delivery_date - dt.datetime.today())
-
-#class Exam(Assignment):
-#    def set_optional(self, optional):
-#        self.optional = optional
-#    def get_optional(self):
-#        return self.optional
 #    
 #class Meeting(Assignment):
 #    def __init__(self):

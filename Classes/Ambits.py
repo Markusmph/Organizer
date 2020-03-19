@@ -62,7 +62,7 @@ class Subject:
         return self.name
     def get_hour(self):
         return self.hour
-    def get_assignments(self):
+    def get_assignm_list(self):
         return self.assignm_list
 
 class Category:
