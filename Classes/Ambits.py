@@ -3,10 +3,6 @@ class Ambit:
         self.list = list
     def add(self, new):
         self.list.append(new)
-    def edit(self, index):
-        pass
-    def remove(self, index):
-        pass
 
 #------------------------------------------------------
 class School(Ambit):
@@ -24,10 +20,17 @@ class Natma(Ambit):
         self.assignm_list = assignm_list
     def add_assignm(self, new_assignm):
         self.assignm_list.append(new_assignm)
+    def create_completed_list(self):
+        self.completed = []
+    def set_as_completed(self, index):
+        self.completed.append(self.assignm_list[index])
+        del self.assignm_list[index]
     def set_assignm_list(self, new_list):
         self.assignm_list = new_list
     def get_assignm_list(self):
         return self.assignm_list
+    def get_completed_list(self):
+        return self.completed
 
 class Personal(Ambit):
     def __init__(self, categ_list=[]):
@@ -64,10 +67,23 @@ class Subject:
         return self.hour
     def get_assignm_list(self):
         return self.assignm_list
+    def get_completed_list(self):
+        return self.completed
 
 class Category:
-   def __init__(self, name, assignm_list=[]):
+    def __init__(self, name, assignm_list=[]):
        self.name = name
        self.assignm_list = assignm_list
        self.completed = []
+    def set_name(self, name):
+        self.name = name
+    def add_assignm(self, new_assignm):
+        self.assignm_list.append(new_assignm)
+    def set_as_completed(self, index):
+        self.completed.append(self.assignm_list[index])
+    def get_name(self):
+        return self.name
+    def get_assignm_list(self):
+        return self.assignm_list
+    
 # ------------------------------------------------------
