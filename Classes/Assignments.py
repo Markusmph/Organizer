@@ -82,7 +82,7 @@ class Exam(Assignment):
 
 
 class PersAssignment(Assignment):
-    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, periodic=True, mandatory=False):
+    def __init__(self, name, delivery_date, perc_in_1hr=100, perc_completed=0, mandatory=False):
         self.name = name
         self.delivery_date = delivery_date
         self.perc_in_1hr = perc_in_1hr
@@ -109,6 +109,56 @@ class PersAssignment(Assignment):
         return self.periodic
     def get_mandatory(self):
         return self.mandatory
+
+class PersAssignmentPeriodic(Assignment):
+    def __init__(self, name, periodic_type, perc_in_1hr=100, perc_completed=0, mandatory=False):
+        self.name = name
+        self.periodic_type = periodic_type
+        self.perc_in_1hr = perc_in_1hr
+        self.perc_completed = perc_completed
+        self.mandatory = mandatory
+        self.set_delivery_dates()
+    def set_delivery_dates(self):
+        if self.periodic_type == 0: # Every day
+            if self.perc_completed >= 100:
+                tomorrow = dt.date.today() + dt.timedelta(day=1)
+                self.set_delivery_date(tomorrow)
+                self.set_perc_completed = 0
+            else:
+                self.set_delivery_date(dt.date.today())
+        elif self.periodic_type < 8 and self.periodic_type > 0:
+            if self.perc_completed >= 100:
+                for i in range(6):
+                    date_to_compare = dt.date.today() + dt.timedelta(day=(i+8))
+                    if date_to_compare.weekday() == (self.periodic_type - 1):
+                        self.set_delivery_date(date_to_compare)
+            else:
+                for i in range(6):
+                    date_to_compare = dt.date.today() + dt.timedelta(day=i)
+                    if date_to_compare.weekday() == (self.periodic_type - 1):
+                        self.set_delivery_date(date_to_compare)
+        else:
+            raise ValueError
+
+    def set_delivery_date(self, new_delivery_date):
+        self.delivery_date = new_delivery_date
+    def update_delivery_date(self):
+        self.set_delivery_dates()
+    def get_mandatory(self):
+        return self.mandatory
+
+# periodic type = 0: Every day 
+# periodic type = 1: Every monday
+# periodic type = 2: Every tuesday
+# periodic type = 3: Every wednesday 
+# periodic type = 4: Every thursday
+# periodic type = 5: Every friday
+# periodic type = 6: Every satruday
+# periodic type = 7: Every sunday
+# 
+# #
+
+
 #    
 #class Meeting(Assignment):
 #    def __init__(self):

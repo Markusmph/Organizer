@@ -6,6 +6,7 @@ disp assignm = display all assignments with its corresponding subject
 disp subj = display all subjects
 disp <subject index> <assignment index> = display the information of an individual assignment
 
+
 edit name <subject index> <assignment index> <new name> = change name of a specific assignment
 edit pcomp <subject index> <assignment index> <new value> = change the percentage of the completion of a specific assignment
 edit p1hr <subject index> <assignment index> <new value> = change the percentage of completion in one hour
@@ -14,6 +15,7 @@ edit mand <subject index> <assignment index> <text> = change the mandatory value
 
 edit npcomp <assignment index> <new value> = change the percentage of the completion of a specific natma assignment
 edit nmand <assignment index> <boolean mandatory value> = change the mandatory value of a natma homework
+
 
 add s <subject name> = add a new subject
 add hw <subject index> = add homework to specific subject
@@ -24,13 +26,16 @@ add n = add homework to natma
 add pc <category name> = add a personal category
 add p <category index> <assignment name> = add assignment to a specific category
 
-rem s <subject index> <assignm index>  = remove an assignment from a specific subject
+
+rem s <subject index> <assignm index>  = remove an assignment from a specific subject from school list
+
 rem n <index> = remove an assignment from natma
+
+rem p <category index> <assignm index> = remove an assignment from a specific category from personal list
+
 
 h <month> <day> = print how many hours remain to complete the assignments that have that date or before
 
 
 
 q = exit program
-quit = exit program
-exit = exit program

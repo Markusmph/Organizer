@@ -2,7 +2,7 @@ import datetime as dt
 import pickle as pk
 
 from Classes.Ambits import Ambit, School, Subject, Natma, Personal, Category
-from Classes.Assignments import Assignment, Homework, Exam, PersAssignment
+from Classes.Assignments import Assignment, Homework, Exam, PersAssignment, PersAssignmentPeriodic
 
 
 # for subj in school.get_subj_list():
@@ -92,7 +92,10 @@ def update_deliveries():
         for assignm in categ.get_assignm_list():
             mandatory = assignm.get_mandatory()
             if assignm.get_delivery_date() < today.date() and not mandatory:
-                assignm.set_delivery_date(today.date())
+                if type(assignm) == PersAssignmentPeriodic:
+                    assignm.update_deliveries()
+                else:
+                    assignm.set_delivery_date(today.date())
             elif assignm.get_delivery_date() < today.date() and mandatory:
                 assignm.set_late(True)
 
@@ -126,14 +129,15 @@ def ordered_list():
                 j += 1
     return (assignments, subject_name)
 
-def print_days_of_week():
-    print("Monday = 0")
-    print("Tuesday = 1")
-    print("Wednesday = 2")
-    print("Thursday = 3")
-    print("Friday = 4")
-    print("Saturday = 5")
-    print("Sunday = 6")
+def periodic_instructions():
+    print("Every day = 0")
+    print("Monday = 1")
+    print("Tuesday = 2")
+    print("Wednesday = 3")
+    print("Thursday = 4")
+    print("Friday = 5")
+    print("Saturday = 6")
+    print("Sunday = 7")
 
 
 #----- display instruction ----
@@ -230,15 +234,20 @@ def display_in_order():
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
         delivery = str(assignm.get_delivery_date())
-        if type(assignm) == Assignment:
+        if assignm.get_mandatory():
+            mand = "      MANDATORY"
+        else:
+            mand = ""
+        if type(assignm) == Homework:
             if assignm.get_late():
                 late = " LATE"
+                mand = ""
             else:
                 late = ""
         else:
             late = ""
             
-        text = "Delivery: " + delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i] + late
+        text = "Delivery: " + delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i] + late + mand
             
         print(text)
         i += 1
@@ -322,20 +331,25 @@ def add_personal_assignment(instruction):
             name += " {0}".format(instruction[i])
         p_input = input("Periodic? (y/n) ")
         if p_input == "True" or p_input == "true" or p_input == "t" or p_input == "yes" or p_input == "y" or p_input == "Y":
-            periodic = True
-            print_days_of_week()
-            delivery_date = int(input("Enter day with integer: "))
+            periodic_instructions()
+            periodic_type = int(input("Enter periodic instruction with integer: "))
+            perc_in1hr = float(input("Percentage done in 1 hour: "))
+            new_assingm = PersAssignmentPeriodic(name, periodic_type, perc_in1hr)
+            personal.get_categ_list()[value].add_assignm(new_assingm)
+            save_in_personal_file()
         elif p_input == "False" or p_input == "false" or p_input == "f" or p_input == "no" or p_input == "n" or p_input == "N":
-            periodic = False
             delivery_date = dt.date(today.year, int(input("Month: ")), int(input("Day: ")))
+            perc_in1hr = float(input("Percentage done in 1 hour: "))
+            new_assignm = PersAssignment(name, delivery_date, perc_in1hr)
+            personal.get_categ_list()[value].add_assignm(new_assignm)
+            save_in_personal_file()
         else:
-            print("Setting periodic as true")
-            periodic = True
-            print_days_of_week()
-            delivery_date = int(input("Enter day with integer: "))
-        new_assignm = PersAssignment(name, delivery_date, periodic=periodic)
-        personal.get_categ_list()[value].add_assignm(new_assignm)
-        save_in_personal_file()
+            print("Creating a non-periodic assignment...")
+            delivery_date = dt.date(today.year, int(input("Month: ")), int(input("Day: ")))
+            perc_in1hr = float(input("Percentage done in 1 hour: "))
+            new_assignm = PersAssignment(name, delivery_date, perc_in1hr)
+            personal.get_categ_list()[value].add_assignm(new_assignm)
+            save_in_personal_file()
     except IndexError:
         print("Please enter the complete instruction: ")
         print("     add p <category index> <assignment name>")
@@ -393,6 +407,7 @@ def edit_perc_completed_natma(instruction):
                 natma.create_completed_list()
                 natma.set_as_completed(assignm_index)
                 print("Completed list created!")
+        save_in_natma_file()
     except IndexError:
         print("Please enter the full instruction:")
         print("     edit npcomp <assignment index> <new value>")
@@ -440,7 +455,8 @@ def edit_mandatory_natma(instruction):
 def remove(instruction):
     noun_dict = {
         "s": remove_from_school,
-        "n": remove_from_natma
+        "n": remove_from_natma,
+        "p": remove_from_personal
     }
     if instruction[0] in noun_dict:
         noun = instruction[0]
@@ -457,6 +473,15 @@ def remove_from_natma(instruction):
     i = int(instruction[0]) - 1
     del natma.get_assignm_list()[i]
     save_in_natma_file()
+def remove_from_personal(instruction):
+    try:
+        categ = int(instruction[0]) - 1
+        assignm = int(instruction[1]) - 1
+        del personal.get_categ_list()[categ].get_assignm_list()[assignm]
+        save_in_personal_file()
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("     rem p <category index> <assignm index>")
 #----- remove instruction ----
 
 #----- remaining hours ----
@@ -464,29 +489,29 @@ def remaining_hrs(instruction):
     try:
         month = int(instruction[0])
         day = int(instruction[1])
+        (assignments, subj_name) = ordered_list()
+
+        time_total = 0
+        time_mandatory = 0
+        time_non_mandatory = 0
+        for assignm in assignments:
+            if assignm.get_delivery_date() <= dt.date(today.year, month, day):
+                if assignm.get_mandatory():
+                    time_mandatory += assignm.get_time_to_finish()
+                elif not assignm.get_mandatory():
+                    time_non_mandatory += assignm.get_time_to_finish()
+        time_total = time_mandatory + time_non_mandatory
+        (hours_mandatory, minutes_mandatory) = decimal_to_time(time_mandatory)
+        (hours_non_mandatory, minutes_non_mandatory) = decimal_to_time(time_non_mandatory)
+        (hours_total, minutes_total) = decimal_to_time(time_total)
+        print("Time remaining to complete assignments until " + str(day) + " of " + str(month))
+        print("............................................................................................")
+        print("Mandatory assignments: " + str(hours_mandatory) + " hours " + str(minutes_mandatory) + " minutes")
+        print("Non-mandatory assignments: " + str(hours_non_mandatory) + " hours " + str(minutes_non_mandatory) + " minutes")
+        print("Total: " + str(hours_total) + " hours " + str(minutes_total) + " minutes")
+        
     except IndexError:
         print("Not enough data")
-    
-    (assignments, subj_name) = ordered_list()
-
-    time_total = 0
-    time_mandatory = 0
-    time_non_mandatory = 0
-    for assignm in assignments:
-        if assignm.get_delivery_date() <= dt.date(today.year, month, day):
-            if assignm.get_mandatory():
-                time_mandatory += assignm.get_time_to_finish()
-            elif not assignm.get_mandatory():
-                time_non_mandatory += assignm.get_time_to_finish()
-    time_total = time_mandatory + time_non_mandatory
-    (hours_mandatory, minutes_mandatory) = decimal_to_time(time_mandatory)
-    (hours_non_mandatory, minutes_non_mandatory) = decimal_to_time(time_non_mandatory)
-    (hours_total, minutes_total) = decimal_to_time(time_total)
-    print("Time remaining to complete assignments until " + str(day) + " of " + str(month))
-    print("............................................................................................")
-    print("Mandatory assignments: " + str(hours_mandatory) + " hours " + str(minutes_mandatory) + " minutes")
-    print("Non-mandatory assignments: " + str(hours_non_mandatory) + " hours " + str(minutes_non_mandatory) + " minutes")
-    print("Total: " + str(hours_total) + " hours " + str(minutes_total) + " minutes")
 
 #----- remaining hours ----
 
@@ -507,9 +532,7 @@ verb_dict = {
     "rem": remove,
     "h": remaining_hrs,
     "help": get_instructions,
-    "q": exit,
-    "quit": exit,
-    "exit": exit
+    "q": exit
 }
 
 (school, natma, personal) = read_files()
@@ -522,13 +545,19 @@ while True:
 
 # for subj in school.get_subj_list():
 #     for assignm in subj.get_assignm_list():
-#         if type(assignm) == Assignment:
+#         if type(assignm) == Homework:
 #             assignm.set_late(False)
 
 # for assignm in natma.get_assignm_list():
-#     if type(assignm) == Assignment:
+#     if type(assignm) == Homework:
 #             assignm.set_late(False)
 
+# for categ in personal.get_categ_list():
+#     for assignm in categ.get_assignm_list():
+#         if type(assignm) == Homework:
+#             assignm.set_late(False)
+
+# save_files()
 
 # Sort without sorting method
 #-----------------------------------
