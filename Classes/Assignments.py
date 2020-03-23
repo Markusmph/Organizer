@@ -117,9 +117,9 @@ class PersAssignmentPeriodic(Assignment):
     def set_delivery_dates(self):
         if self.periodic_type == 0: # Every day
             if self.perc_completed >= 100:
-                tomorrow = dt.date.today() + dt.timedelta(days=1)
-                self.set_delivery_date(tomorrow)
-                self.set_perc_completed = 0
+                self.perc_completed = 0
+                new_date = self.delivery_date + dt.timedelta(days=1)
+                self.set_delivery_date(new_date)
             else:
                 self.set_delivery_date(dt.date.today())
         elif self.periodic_type < 8 and self.periodic_type > 0:

@@ -364,8 +364,10 @@ def edit(instruction):
         "pname": edit_name_personal,
         "pcomp": edit_perc_completed,
         "npcomp": edit_perc_completed_natma,
+        "ppcomp": edit_perc_completed_personal,
         "p1hr": edit_perc_1hr,
         "delivery": edit_delivery_date,
+        "ndelivery": edit_delivery_date_natma,
         "mand": edit_mandatory,
         "nmand": edit_mandatory_natma
     }
@@ -414,6 +416,16 @@ def edit_perc_completed_natma(instruction):
     except IndexError:
         print("Please enter the full instruction:")
         print("     edit npcomp <assignment index> <new value>")
+def edit_perc_completed_personal(instruction):
+    try:
+        categ_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
+        value = float(instruction[2])
+        personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_completed(value)
+        save_in_personal_file()
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("     edit ppcomp <category index> <assignment index> <percentage>")
 def edit_perc_1hr(instruction):
     subj_index = instruction[0]
     assignm_index = instruction[1]
@@ -426,6 +438,11 @@ def edit_delivery_date(instruction):
     delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
     school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_delivery_date(delivery_date)
     save_in_school_file()
+def edit_delivery_date_natma(instruction):
+    assignm_index = int(instruction[0]) - 1
+    delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
+    natma.get_assignm_list()[assignm_index].set_delivery_date(delivery_date)
+    save_in_natma_file()
 def edit_mandatory(instruction):
     try:
         subj_index = instruction[0]
