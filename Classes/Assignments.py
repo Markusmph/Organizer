@@ -13,7 +13,7 @@ class Assignment:
         self.duration = new_duration
     def set_delivery_date(self, new_delivery_date):
         self.delivery_date = new_delivery_date
-        self.recomended_date = new_delivery_date - dt.timedelta(1)
+        self.recomended_date = new_delivery_date - dt.timedelta(days=1)
     def set_recomended_date(self, new_recomended_date):
         self.recomended_date = new_recomended_date
     def set_perc_completed(self, new_perc_completed):
@@ -87,7 +87,6 @@ class PersAssignment(Assignment):
         self.delivery_date = delivery_date
         self.perc_in_1hr = perc_in_1hr
         self.perc_completed = perc_completed
-        self.periodic = periodic
         self.mandatory = mandatory
     def set_delivery_date(self, new_delivery_date):
         self.delivery_date = new_delivery_date
@@ -95,8 +94,6 @@ class PersAssignment(Assignment):
         self.perc_in_1hr = perc
     def set_completed(self, perc_completed):
         self.perc_completed = perc_completed
-    def set_periodic(self, periodic):
-        self.periodic = periodic
     def set_mandatory(self, mandatory):
         self.mandatory = mandatory
     def get_perc_in1hr(self):
@@ -105,8 +102,6 @@ class PersAssignment(Assignment):
         return 100 - self.perc_completed
     def get_time_to_finish(self):
         return ((100 - self.perc_completed)/self.perc_in_1hr)
-    def get_periodic(self):
-        return self.periodic
     def get_mandatory(self):
         return self.mandatory
 
@@ -117,11 +112,12 @@ class PersAssignmentPeriodic(Assignment):
         self.perc_in_1hr = perc_in_1hr
         self.perc_completed = perc_completed
         self.mandatory = mandatory
+        self.delivery_date = dt.date.today()
         self.set_delivery_dates()
     def set_delivery_dates(self):
         if self.periodic_type == 0: # Every day
             if self.perc_completed >= 100:
-                tomorrow = dt.date.today() + dt.timedelta(day=1)
+                tomorrow = dt.date.today() + dt.timedelta(days=1)
                 self.set_delivery_date(tomorrow)
                 self.set_perc_completed = 0
             else:
@@ -129,12 +125,12 @@ class PersAssignmentPeriodic(Assignment):
         elif self.periodic_type < 8 and self.periodic_type > 0:
             if self.perc_completed >= 100:
                 for i in range(6):
-                    date_to_compare = dt.date.today() + dt.timedelta(day=(i+8))
+                    date_to_compare = dt.date.today() + dt.timedelta(days=(i+8))
                     if date_to_compare.weekday() == (self.periodic_type - 1):
                         self.set_delivery_date(date_to_compare)
             else:
                 for i in range(6):
-                    date_to_compare = dt.date.today() + dt.timedelta(day=i)
+                    date_to_compare = dt.date.today() + dt.timedelta(days=i)
                     if date_to_compare.weekday() == (self.periodic_type - 1):
                         self.set_delivery_date(date_to_compare)
         else:
@@ -142,6 +138,9 @@ class PersAssignmentPeriodic(Assignment):
 
     def set_delivery_date(self, new_delivery_date):
         self.delivery_date = new_delivery_date
+    def set_completed(self, perc_completed):
+        self.perc_completed = perc_completed
+        self.set_delivery_dates()
     def update_delivery_date(self):
         self.set_delivery_dates()
     def get_mandatory(self):

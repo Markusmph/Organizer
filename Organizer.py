@@ -93,7 +93,7 @@ def update_deliveries():
             mandatory = assignm.get_mandatory()
             if assignm.get_delivery_date() < today.date() and not mandatory:
                 if type(assignm) == PersAssignmentPeriodic:
-                    assignm.update_deliveries()
+                    assignm.update_delivery_date()
                 else:
                     assignm.set_delivery_date(today.date())
             elif assignm.get_delivery_date() < today.date() and mandatory:
@@ -361,6 +361,7 @@ def edit(instruction):
     del instruction[0]
     noun_dict = {
         "name": edit_name,
+        "pname": edit_name_personal,
         "pcomp": edit_perc_completed,
         "npcomp": edit_perc_completed_natma,
         "p1hr": edit_perc_1hr,
@@ -380,6 +381,8 @@ def edit_name(instruction):
         value += " " + instruction[i]
     school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_name(value)
     save_in_school_file()
+def edit_name_personal(instruction):
+    pass
 def edit_perc_completed(instruction):
     subj_index = int(instruction[0]) - 1
     assignm_index = int(instruction[1]) - 1
@@ -444,6 +447,8 @@ def edit_mandatory_natma(instruction):
         new_value = True
     elif instruction[1] == "False" or instruction[1] == "false" or instruction[1] == "f":
         new_value = False
+        if natma.get_assignm_list()[int(assignm_index) - 1].get_late():
+            natma.get_assignm_list()[int(assignm_index) - 1].set_delivery_date(today.date)
     else:
         print("Setting value as True")
         new_value = True
@@ -543,6 +548,13 @@ while True:
     run_instruc(get_input())
 
 
+# del personal.get_categ_list()[2].get_assignm_list()[0]
+# save_in_personal_file()
+# for categ in personal.get_categ_list():
+#     for assignm in categ.get_assignm_list():
+#         print(categ.get_name() + " Assignm: " + assignm.get_name() + " DeliveryDate: " + str(assignm.get_delivery_date()))
+
+
 # for subj in school.get_subj_list():
 #     for assignm in subj.get_assignm_list():
 #         if type(assignm) == Homework:
@@ -573,7 +585,7 @@ while True:
 #     return list
 
 
-
+# TODO: edit personal assignment name
 # TODO: set date of subject
 # TODO: set recomended date based on duration and delivery date
 # TODO: show to the user what to do

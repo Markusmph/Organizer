@@ -16,6 +16,8 @@ edit mand <subject index> <assignment index> <text> = change the mandatory value
 edit npcomp <assignment index> <new value> = change the percentage of the completion of a specific natma assignment
 edit nmand <assignment index> <boolean mandatory value> = change the mandatory value of a natma homework
 
+edit pname <category index> <assignment index> <new name> = change the name of an assignment
+
 
 add s <subject name> = add a new subject
 add hw <subject index> = add homework to specific subject
