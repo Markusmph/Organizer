@@ -421,7 +421,7 @@ def edit_perc_completed_personal(instruction):
         categ_index = int(instruction[0]) - 1
         assignm_index = int(instruction[1]) - 1
         value = float(instruction[2])
-        personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_completed(value)
+        personal.get_categ_list()[categ_index].set_completed(assignm_index, value)
         save_in_personal_file()
     except IndexError:
         print("Please enter the full instruction:")
@@ -478,7 +478,8 @@ def remove(instruction):
     noun_dict = {
         "s": remove_from_school,
         "n": remove_from_natma,
-        "p": remove_from_personal
+        "p": remove_from_personal,
+        "pc": remove_categ_from_personal
     }
     if instruction[0] in noun_dict:
         noun = instruction[0]
@@ -504,6 +505,14 @@ def remove_from_personal(instruction):
     except IndexError:
         print("Please enter the full instruction:")
         print("     rem p <category index> <assignm index>")
+def remove_categ_from_personal(instruction):
+    try:
+        categ_index = int(instruction[0]) - 1
+        del personal.get_categ_list()[categ_index]
+        save_in_personal_file()
+    except IndexError:
+        print("Please enter the full instrucion:")
+        print("     rem pc <category index>")
 #----- remove instruction ----
 
 #----- remaining hours ----
@@ -537,6 +546,34 @@ def remaining_hrs(instruction):
 
 #----- remaining hours ----
 
+#----- What to do ----
+def what_to_do(instruction):
+    (assignments, subject_name) = ordered_list()
+    i = 1
+    j = 1
+    print("Today:")
+    for assignm in assignments:
+        (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
+        if assignm.get_mandatory() and ((assignm.get_delivery_date() - dt.timedelta(days=hours)) <= today.date()):
+            print(str(i) + ") " + assignm.get_name() + " - Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
+            i += 1
+        # if (assignm.get_delivery_date() <= today.date()) and assignm.get_mandatory():
+        #     (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
+        #     print(str(i) + ") " + assignm.get_name() + " Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
+        #     i += 1
+        # elif assignm.get_delivery_date() > today.date() and assignm.get_mandatory():
+        #     (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
+        #     if (assignm.get_delivery_date() - dt.timedelta(days=hours)) <= today.date():
+        #         print(str(i) + ") " + assignm.get_name() + " Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
+        #         i += 1
+        #     else:
+        #         break
+                # print("Tomorrow:")
+                # if (assignm.get_delivery_date() - dt.timedelta(days=hours_to_finish)) <= (today.date() + dt.timedelta(days=1)):
+                #     print(str(j) + ") " + assignm.get_name() + " Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
+                #     j += 1
+#----- What to do ----
+
 #----- help ----
 def get_instructions(instruction):
     f = open("instructions.txt", "r")
@@ -553,6 +590,7 @@ verb_dict = {
     "edit": edit,
     "rem": remove,
     "h": remaining_hrs,
+    "now": what_to_do,
     "help": get_instructions,
     "q": exit
 }

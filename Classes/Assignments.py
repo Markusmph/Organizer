@@ -61,8 +61,8 @@ class Homework(Assignment):
         return self.mandatory
     def get_late(self):
         return self.late
-    #def get_days_remaining(self):
-    #    return (self.delivery_date - dt.datetime.today())
+    def get_days_remaining(self):
+        return (self.delivery_date - dt.datetime.today().date)
 
 class Exam(Assignment):
     def __init__(self, name, delivery_date, time_to_study=2, perc_completed=0):

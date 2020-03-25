@@ -35,6 +35,7 @@ rem s <subject index> <assignm index>  = remove an assignment from a specific su
 
 rem n <index> = remove an assignment from natma
 
+rem pc <category index> = remove a category with all its assignments from personal list
 rem p <category index> <assignm index> = remove an assignment from a specific category from personal list
 
 

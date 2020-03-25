@@ -1,3 +1,5 @@
+from Classes.Assignments import PersAssignment, PersAssignmentPeriodic
+
 class Ambit:
     def __init__(self, list=[]):
         self.list = list
@@ -79,11 +81,17 @@ class Category:
         self.name = name
     def add_assignm(self, new_assignm):
         self.assignm_list.append(new_assignm)
-    def set_as_completed(self, index):
-        self.completed.append(self.assignm_list[index])
+    def set_completed(self, index, value):
+        if (value == 100) and (type(self.assignm_list[index]) == PersAssignment):
+            self.completed.append(self.assignm_list[index])
+            del self.assignm_list[index]
+        else:
+            self.assignm_list[index].set_completed(value)
     def get_name(self):
         return self.name
     def get_assignm_list(self):
         return self.assignm_list
+    def get_completed_list(self):
+        return self.completed
     
 # ------------------------------------------------------
