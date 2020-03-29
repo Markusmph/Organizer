@@ -138,6 +138,7 @@ def periodic_instructions():
     print("Friday = 5")
     print("Saturday = 6")
     print("Sunday = 7")
+    print("Every month = 8")
 
 
 #----- display instruction ----
@@ -376,15 +377,21 @@ def edit(instruction):
     else:
         print("Please use a valid noun")
 def edit_name(instruction):
-    subj_index = instruction[0]
-    assignm_index = instruction[1]
+    subj_index = int(instruction[0]) - 1
+    assignm_index = int(instruction[1]) - 1
     value = instruction[2]
     for i in range(3, len(instruction)):
         value += " " + instruction[i]
-    school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_name(value)
+    school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_name(value)
     save_in_school_file()
 def edit_name_personal(instruction):
-    pass
+    categ_index = int(instruction[0]) - 1
+    assignm_index = int(instruction[1]) - 1
+    value = instruction[2]
+    for i in range(3, len(instruction)):
+        value += " " + instruction[i]
+    personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_name(value)
+    save_in_personal_file()
 def edit_perc_completed(instruction):
     subj_index = int(instruction[0]) - 1
     assignm_index = int(instruction[1]) - 1
@@ -445,16 +452,19 @@ def edit_delivery_date_natma(instruction):
     save_in_natma_file()
 def edit_mandatory(instruction):
     try:
-        subj_index = instruction[0]
-        assignm_index = instruction[1]
+        subj_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
         if instruction[2] == "True" or instruction[2] == "true" or instruction[2] == "t":
             new_value = True
         elif instruction[2] == "False" or instruction[2] == "false" or instruction[2] == "f":
             new_value = False
+            assignm = school.get_subj_list()[subj_index].get_assignm_list()[assignm_index]
+            if assignm.get_delivery_date() < today.date():
+                assignm.set_delivery_date(today.date())
         else:
             print("Setting value as True")
             new_value = True
-        school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_mandatory(new_value)
+        school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_mandatory(new_value)
         save_in_school_file()
     except IndexError:
         print("Not enough info. Instruction: \"edit mand <subject index> <assignment index> <text>\"")
@@ -639,9 +649,7 @@ while True:
 #                 j += 1
 #     return list
 
-
-# TODO: edit personal assignment name
+# TODO: display now list based on delivery - hours
 # TODO: set date of subject
 # TODO: set recomended date based on duration and delivery date
-# TODO: show to the user what to do
 # TODO: create gui

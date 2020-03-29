@@ -1,4 +1,5 @@
 import datetime as dt
+from calendar import monthrange
 
 class Assignment:
     def __init__(self, name, delivery_date, duration, perc_completed=0):
@@ -65,7 +66,7 @@ class Homework(Assignment):
         return (self.delivery_date - dt.datetime.today().date)
 
 class Exam(Assignment):
-    def __init__(self, name, delivery_date, time_to_study=2, perc_completed=0):
+    def __init__(self, name, delivery_date, time_to_study=4, perc_completed=0):
         self.name = name
         self.delivery_date = delivery_date
         self.time_to_study = time_to_study
@@ -73,6 +74,8 @@ class Exam(Assignment):
         self.study_date = self.delivery_date-dt.timedelta(1)
     def set_time_to_study(self, time_to_study):
         self.time_to_study = time_to_study
+    def set_completed(self, perc_completed):
+        self.perc_completed = perc_completed
     def get_time_to_study(self):
         return self.get_time_to_study
     def get_mandatory(self):
@@ -122,20 +125,61 @@ class PersAssignmentPeriodic(Assignment):
                 self.set_delivery_date(new_date)
             else:
                 self.set_delivery_date(dt.date.today())
-        elif self.periodic_type < 8 and self.periodic_type > 0:
+        elif self.periodic_type < 8 and self.periodic_type > 0: # Weekly
             if self.perc_completed >= 100:
-                for i in range(6):
+                self.perc_completed = 0
+                for i in range(7):
                     date_to_compare = dt.date.today() + dt.timedelta(days=(i+8))
                     if date_to_compare.weekday() == (self.periodic_type - 1):
                         self.set_delivery_date(date_to_compare)
             else:
-                for i in range(6):
+                for i in range(7):
                     date_to_compare = dt.date.today() + dt.timedelta(days=i)
                     if date_to_compare.weekday() == (self.periodic_type - 1):
                         self.set_delivery_date(date_to_compare)
+        elif self.periodic_type == 8: # Monthly
+            try:
+                monthly_option = self.monthly_option
+            except AttributeError:
+                print("Please enter your answer with the index")
+                print("1) First saturday of each month")
+                print("2) Second saturday of each month")
+                print("3) Third saturday of each month")
+                print("4) Fourth saturday of each month")
+                self.monthly_option = int(input(": "))
+                monthly_option = self.monthly_option
+            if self.perc_completed >= 100:
+                self.perc_completed = 0
+                counter = 0
+                date_to_compare = self.delivery_date + dt.timedelta(days=1)
+                while (date_to_compare + dt.timedelta(days=1)).month == self.delivery_date.month:
+                    date_to_compare += dt.timedelta(days=1)
+                while counter != monthly_option:
+                    date_to_compare += dt.timedelta(days=1)
+                    if date_to_compare.weekday() == 5:
+                        counter += 1
+                self.set_delivery_date(date_to_compare)
+            else:
+                counter = 0
+                date_to_compare = dt.date(self.delivery_date.year, self.delivery_date.month, 1) - dt.timedelta(days=1)
+                while counter != monthly_option:
+                    date_to_compare += dt.timedelta(days=1)
+                    if date_to_compare.weekday() == 5:
+                        counter += 1
+                if date_to_compare >= dt.date.today():
+                    self.set_delivery_date(date_to_compare)
+                else:
+                    counter = 0
+                    date_to_compare = self.delivery_date
+                    while (date_to_compare + dt.timedelta(days=1)).month == self.delivery_date.month:
+                        date_to_compare += dt.timedelta(days=1)
+                    while counter != monthly_option:
+                        date_to_compare += dt.timedelta(days=1)
+                        if date_to_compare.weekday() == 5:
+                            counter += 1
+                    self.set_delivery_date(date_to_compare)
         else:
             raise ValueError
-
     def set_delivery_date(self, new_delivery_date):
         self.delivery_date = new_delivery_date
     def set_completed(self, perc_completed):
@@ -154,7 +198,7 @@ class PersAssignmentPeriodic(Assignment):
 # periodic type = 5: Every friday
 # periodic type = 6: Every satruday
 # periodic type = 7: Every sunday
-# 
+# periodic type = 8: Every specific day of a month
 # #
 
 
