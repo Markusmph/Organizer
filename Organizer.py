@@ -367,6 +367,7 @@ def edit(instruction):
         "npcomp": edit_perc_completed_natma,
         "ppcomp": edit_perc_completed_personal,
         "p1hr": edit_perc_1hr,
+        "pp1hr": edit_perc_1hr_personal,
         "delivery": edit_delivery_date,
         "ndelivery": edit_delivery_date_natma,
         "mand": edit_mandatory,
@@ -434,11 +435,17 @@ def edit_perc_completed_personal(instruction):
         print("Please enter the full instruction:")
         print("     edit ppcomp <category index> <assignment index> <percentage>")
 def edit_perc_1hr(instruction):
-    subj_index = instruction[0]
-    assignm_index = instruction[1]
-    value = instruction[2]
-    school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_perc_in1hr(float(value))
+    subj_index = int(instruction[0]) - 1
+    assignm_index = int(instruction[1]) - 1
+    value = float(instruction[2])
+    school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_perc_in1hr(value)
     save_in_school_file()
+def edit_perc_1hr_personal(instruction):
+    categ_index = int(instruction[0]) - 1
+    assignm_index = int(instruction[1]) - 1
+    value = float(instruction[2])
+    personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_perc_in1hr(value)
+    save_in_personal_file()
 def edit_delivery_date(instruction):
     subj_index = instruction[0]
     assignm_index = instruction[1]

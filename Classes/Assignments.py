@@ -99,6 +99,8 @@ class PersAssignment(Assignment):
         self.perc_completed = perc_completed
     def set_mandatory(self, mandatory):
         self.mandatory = mandatory
+    def set_perc_in1hr(self, perc):
+        self.perc_in_1hr = perc
     def get_perc_in1hr(self):
         return self.perc_in_1hr
     def get_missing_perc(self):
@@ -107,6 +109,8 @@ class PersAssignment(Assignment):
         return ((100 - self.perc_completed)/self.perc_in_1hr)
     def get_mandatory(self):
         return self.mandatory
+    def get_perc_in1hr(self):
+        return self.perc_in_1hr
 
 class PersAssignmentPeriodic(Assignment):
     def __init__(self, name, periodic_type, perc_in_1hr=100, perc_completed=0, mandatory=False):
@@ -185,10 +189,14 @@ class PersAssignmentPeriodic(Assignment):
     def set_completed(self, perc_completed):
         self.perc_completed = perc_completed
         self.set_delivery_dates()
+    def set_perc_in1hr(self, perc):
+        self.perc_in_1hr = perc
     def update_delivery_date(self):
         self.set_delivery_dates()
     def get_mandatory(self):
         return self.mandatory
+    def get_perc_in1hr(self):
+        return self.perc_in_1hr
 
 # periodic type = 0: Every day 
 # periodic type = 1: Every monday
