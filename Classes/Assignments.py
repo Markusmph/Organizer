@@ -63,7 +63,7 @@ class Homework(Assignment):
     def get_late(self):
         return self.late
     def get_days_remaining(self):
-        return (self.delivery_date - dt.datetime.today().date)
+        return (self.delivery_date - dt.date.today())
 
 class Exam(Assignment):
     def __init__(self, name, delivery_date, time_to_study=4, perc_completed=0):
@@ -182,6 +182,10 @@ class PersAssignmentPeriodic(Assignment):
                         if date_to_compare.weekday() == 5:
                             counter += 1
                     self.set_delivery_date(date_to_compare)
+        elif self.periodic_type == 9: # Every 2 days
+            if self.perc_completed >= 100:
+                self.perc_completed = 0
+            self.set_delivery_date(self.delivery_date + dt.timedelta(days=2))
         else:
             raise ValueError
     def set_delivery_date(self, new_delivery_date):

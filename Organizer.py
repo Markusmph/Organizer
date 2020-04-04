@@ -104,19 +104,23 @@ def update_deliveries():
 def ordered_list():
     assignments = []
     subject_name = []
+    # delivery_dates = []
     for subj in school.get_subj_list():
         for assignm in subj.get_assignm_list():
             assignments.append(assignm)
             subject_name.append(subj.get_name())
+            # delivery_dates.append(assignm.get_delivery_date())
 
     for assignm in natma.get_assignm_list():
         assignments.append(assignm)
         subject_name.append("Natma")
+        # delivery_dates.append(assignm.get_delivery_date())
 
     for categ in personal.get_categ_list():
         for assignm in categ.get_assignm_list():
             assignments.append(assignm)
             subject_name.append("Personal")
+            # delivery_dates.append(assignm.get_delivery_date())
 
     for i in range(1, len(assignments)):
         j = i
@@ -129,6 +133,19 @@ def ordered_list():
                 j += 1
     return (assignments, subject_name)
 
+def order_list(list_to_order, list_with_parameter):
+    for i in range(1, len(list_to_order)):
+        j = i
+        while j < len(list_to_order):
+            if list_with_parameter[i-1] > list_with_parameter[j]:
+                (list_to_order[i-1], list_to_order[j]) = (list_to_order[j], list_to_order[i-1])
+                (list_with_parameter[i-1], list_with_parameter[j]) = (list_with_parameter[j], list_with_parameter[i-1])
+                j = i
+            else:
+                j += 1
+    return list_to_order
+
+
 def periodic_instructions():
     print("Every day = 0")
     print("Monday = 1")
@@ -139,6 +156,7 @@ def periodic_instructions():
     print("Saturday = 6")
     print("Sunday = 7")
     print("Every month = 8")
+    print("Every 2 days = 9")
 
 
 #----- display instruction ----
@@ -566,29 +584,23 @@ def remaining_hrs(instruction):
 #----- What to do ----
 def what_to_do(instruction):
     (assignments, subject_name) = ordered_list()
+    to_do_list = []
+    param_list = []
     i = 1
     j = 1
     print("Today:")
     for assignm in assignments:
-        (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
+        (hours, minutes) = decimal_to_time(round(assignm.get_time_to_finish()))
         if assignm.get_mandatory() and ((assignm.get_delivery_date() - dt.timedelta(days=hours)) <= today.date()):
-            print(str(i) + ") " + assignm.get_name() + " - Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
-            i += 1
-        # if (assignm.get_delivery_date() <= today.date()) and assignm.get_mandatory():
-        #     (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
-        #     print(str(i) + ") " + assignm.get_name() + " Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
-        #     i += 1
-        # elif assignm.get_delivery_date() > today.date() and assignm.get_mandatory():
-        #     (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
-        #     if (assignm.get_delivery_date() - dt.timedelta(days=hours)) <= today.date():
-        #         print(str(i) + ") " + assignm.get_name() + " Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
-        #         i += 1
-        #     else:
-        #         break
-                # print("Tomorrow:")
-                # if (assignm.get_delivery_date() - dt.timedelta(days=hours_to_finish)) <= (today.date() + dt.timedelta(days=1)):
-                #     print(str(j) + ") " + assignm.get_name() + " Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
-                #     j += 1
+            to_do_list.append(assignm)
+            param_list.append(assignm.get_delivery_date() - dt.timedelta(days=hours))
+            #print(str(i) + ") " + assignm.get_name() + " - Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
+
+    to_do_list = order_list(to_do_list, param_list)
+    for assignm in to_do_list:
+        (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
+        print(str(i) + ") " + assignm.get_name() + " - Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
+        i += 1
 #----- What to do ----
 
 #----- help ----
@@ -656,7 +668,10 @@ while True:
 #                 j += 1
 #     return list
 
-# TODO: display now list based on delivery - hours
+# TODO: Set p1hr when creating assignment
+# TODO: With instruction now, display most inmediate deliveries at the top
+# TODO: display difference in instruction now
+# TODO: add periodic assignment of Natma (for ros course)
 # TODO: set date of subject
 # TODO: set recomended date based on duration and delivery date
 # TODO: create gui
