@@ -133,7 +133,7 @@ class PersAssignmentPeriodic(Assignment):
             if self.perc_completed >= 100:
                 self.perc_completed = 0
                 for i in range(7):
-                    date_to_compare = dt.date.today() + dt.timedelta(days=(i+8))
+                    date_to_compare = dt.date.today() + dt.timedelta(days=(i+7))
                     if date_to_compare.weekday() == (self.periodic_type - 1):
                         self.set_delivery_date(date_to_compare)
             else:

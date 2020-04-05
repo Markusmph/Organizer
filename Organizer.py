@@ -631,6 +631,10 @@ update_deliveries()
 while True:
     run_instruc(get_input())
 
+# delivery = dt.date(2020, 4, 11)
+# personal.get_categ_list()[2].get_assignm_list()[3].set_delivery_date(delivery)
+# save_in_personal_file()
+
 
 # del personal.get_categ_list()[2].get_assignm_list()[0]
 # save_in_personal_file()
