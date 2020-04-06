@@ -308,7 +308,8 @@ def add_homework(instruction):
     subj_index = instruction[0]
     name = input("Name: ")
     delivery_date = dt.date(today.year, int(input("Month of delivery: ")), int(input("Day of delivery: ")))
-    assignment = Homework(name, delivery_date)
+    p1hr = float(input("Percentage done in 1 hour: "))
+    assignment = Homework(name, delivery_date, p1hr)
     school.get_subj_list()[int(subj_index)-1].add_assignm(assignment)
     save_in_school_file()
 def add_natma(instruction):
@@ -586,9 +587,11 @@ def what_to_do(instruction):
     (assignments, subject_name) = ordered_list()
     to_do_list = []
     param_list = []
+    urgent_list = []
     i = 1
     j = 1
     print("Today:")
+
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(round(assignm.get_time_to_finish()))
         if assignm.get_mandatory() and ((assignm.get_delivery_date() - dt.timedelta(days=hours)) <= today.date()):
@@ -597,6 +600,16 @@ def what_to_do(instruction):
             #print(str(i) + ") " + assignm.get_name() + " - Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
 
     to_do_list = order_list(to_do_list, param_list)
+
+    for assignm in to_do_list:
+        if (assignm.get_delivery_date() == today.date()) or (assignm.get_delivery_date() == (today.date() + dt.timedelta(days=1))):
+            urgent_list = urgent_list + [assignm]
+
+    for assignm in urgent_list:
+        to_do_list.remove(assignm)
+
+    to_do_list = urgent_list + to_do_list
+
     for assignm in to_do_list:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
         print(str(i) + ") " + assignm.get_name() + " - Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
@@ -672,8 +685,6 @@ while True:
 #                 j += 1
 #     return list
 
-# TODO: Set p1hr when creating assignment
-# TODO: With instruction now, display most inmediate deliveries at the top
 # TODO: display difference in instruction now
 # TODO: add periodic assignment of Natma (for ros course)
 # TODO: set date of subject
