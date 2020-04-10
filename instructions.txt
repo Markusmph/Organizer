@@ -4,7 +4,9 @@ disp inor = display all assignments in order of delivery date
 
 disp assignm = display all assignments with its corresponding subject
 disp subj = display all subjects
-disp <subject index> <assignment index> = display the information of an individual assignment
+disp s <subject index> <assignment index> = display the information of an individual assignment
+
+disp p <category index> = display a specific personal category with its assignments
 
 
 edit name <subject index> <assignment index> <new name> = change name of a specific assignment

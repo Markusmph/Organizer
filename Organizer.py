@@ -165,18 +165,18 @@ def display(instruction):
         "assignm": display_assignments,
         "subj": display_subj,
         "inor": display_in_order,
-        "display one": dislpay_one
+        #"display one": dislpay_one,
+        "p": display_pers,
+        "s": dislpay_one
     }
-
     if len(instruction) == 0:
         display_all()
-    elif len(instruction) == 1:
-        if instruction[0] in noun_dict:
-            noun_dict[instruction[0]]()
-        else:
-            print("Please use a valid noun")
+    elif instruction[0] in noun_dict:
+        noun = instruction[0]
+        del instruction[0]
+        noun_dict[noun](instruction)
     else:
-        noun_dict["display one"](instruction[0], instruction[1])
+        print("Please use a valid noun")
 
 def display_all():
     print("--------------------- SCHOOL -----------------------------")
@@ -217,20 +217,20 @@ def display_all():
             j += 1
         i += 1
 
-def display_subj():
+def display_subj(instruction):
     i = 1
     for subject in range(len(school.subj_list)):
         print(str(i) + ") " + school.subj_list[subject].name)
         i += 1
-def display_assignments():
+def display_assignments(instrucion):
     i = 1
     for subj in school.get_subj_list():
         for assignm in subj.get_assignm_list():
             print(str(i) + ") " + assignm.get_name() + " - " + subj.get_name())
             i += 1
-def dislpay_one(subj_index, assignm_index):
-    i = int(subj_index) - 1
-    j = int(assignm_index) - 1
+def dislpay_one(instrucion):
+    i = int(instrucion[0]) - 1
+    j = int(instrucion[1]) - 1
     try:
         assignment = school.get_subj_list()[i].get_assignm_list()[j]
         print(assignment.get_name())
@@ -245,7 +245,7 @@ def dislpay_one(subj_index, assignm_index):
     except IndexError:
         print("That assignment doesn't exist!")
     
-def display_in_order():
+def display_in_order(instruction):
     (assignments, subject_name) = ordered_list()
     i = 0
     assignments.reverse()
@@ -275,6 +275,24 @@ def display_in_order():
                 print("")
         except IndexError:
             print("")
+
+def display_pers(instruction):
+    try:
+        categ_index = int(instruction[0]) - 1
+        print(personal.get_categ_list()[categ_index].get_name() + ":")
+        print("---------------------------------------------------------")
+        i = 1
+        for assignm in personal.get_categ_list()[categ_index].get_assignm_list():
+            print("     " + str(i) + ") " + assignm.get_name())
+            if type(assignm) == PersAssignmentPeriodic:
+                assignm_type = "Periodic"
+            elif type(assignm) == PersAssignment:
+                assignm_type = "Non periodic"
+            print("          " + assignm_type)
+            i += 1
+    except IndexError:
+        print("Not enough elements to the instruction")
+        print("Please enter \"disp p <category index>\"")
 #----- display instruction ----
 
 #----- add instruction ----
@@ -685,8 +703,9 @@ while True:
 #                 j += 1
 #     return list
 
+# TODO: display one assignment
+# TODO: clean up code
 # TODO: display difference in instruction now
-# TODO: add periodic assignment of Natma (for ros course)
 # TODO: set date of subject
 # TODO: set recomended date based on duration and delivery date
 # TODO: create gui
