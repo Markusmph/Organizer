@@ -606,9 +606,17 @@ def what_to_do(instruction):
     to_do_list = []
     param_list = []
     urgent_list = []
+    non_mand_list = []
+    non_mand_param_list = []
     i = 1
     j = 1
-    print("Today:")
+
+    for assignm in assignments:
+        if assignm.get_mandatory() and (assignm.get_delivery_date() <= (today.date() + dt.timedelta(days=1))):
+            urgent_list += [assignm]
+
+    for assignm in urgent_list:
+        assignments.remove(assignm)
 
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(round(assignm.get_time_to_finish()))
@@ -616,17 +624,13 @@ def what_to_do(instruction):
             to_do_list.append(assignm)
             param_list.append(assignm.get_delivery_date() - dt.timedelta(days=hours))
             #print(str(i) + ") " + assignm.get_name() + " - Missing time: " + str(hours) + " hours, " + str(minutes) + " minutes " + "Delivery: " + str(assignm.get_delivery_date()))
-
+        elif not assignm.get_mandatory() and ((assignm.get_delivery_date() - dt.timedelta(days=hours)) <= today.date()):
+            non_mand_list.append(assignm)
+            non_mand_param_list.append(assignm.get_delivery_date() - dt.timedelta(days=hours))
+            
     to_do_list = order_list(to_do_list, param_list)
-
-    for assignm in to_do_list:
-        if (assignm.get_delivery_date() == today.date()) or (assignm.get_delivery_date() == (today.date() + dt.timedelta(days=1))):
-            urgent_list = urgent_list + [assignm]
-
-    for assignm in urgent_list:
-        to_do_list.remove(assignm)
-
-    to_do_list = urgent_list + to_do_list
+    non_mand_list = order_list(non_mand_list, non_mand_param_list)
+    to_do_list = urgent_list + to_do_list + non_mand_list
 
     for assignm in to_do_list:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
