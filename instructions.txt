@@ -22,6 +22,7 @@ edit nmand <assignment index> <boolean mandatory value> = change the mandatory v
 edit pname <category index> <assignment index> <new name> = change the name of an assignment
 edit ppcomp <category index> <assignment index> <percentage> = change the percentage of the completion of a specific personal assignment
 edit pp1hr <category index> <assignment index> <new value> = change the percentage of completion in one hour
+edit pdelivery <category index> <assignment index> = change the delivery date of a specific personal assignment
 
 
 add s <subject name> = add a new subject

@@ -218,10 +218,20 @@ def display_all():
         i += 1
 
 def display_subj(instruction):
-    i = 1
-    for subject in range(len(school.subj_list)):
-        print(str(i) + ") " + school.subj_list[subject].name)
-        i += 1
+    if len(instruction) == 0:
+        i = 1
+        for subject in range(len(school.subj_list)):
+            print(str(i) + ") " + school.subj_list[subject].name)
+            i += 1
+    elif len(instruction) >= 1:
+        subj_index = int(instruction[0]) - 1
+        subj = school.get_subj_list()[subj_index]
+        print(subj.get_name())
+        print("------------------------------")
+        i = 1
+        for assignm in subj.get_assignm_list():
+            print(str(i) + ") " + assignm.get_name() + " Delivery: " + str(assignm.get_delivery_date()))
+            i += 1
 def display_assignments(instrucion):
     i = 1
     for subj in school.get_subj_list():
@@ -233,15 +243,21 @@ def dislpay_one(instrucion):
     j = int(instrucion[1]) - 1
     try:
         assignment = school.get_subj_list()[i].get_assignm_list()[j]
-        print(assignment.get_name())
-        print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
-        print("     " + "Recomended date: " + str(assignment.get_recomended_date()))
-        print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
-        print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
-        print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
-        print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
-        print("     " + "Mandatory: " + str(assignment.get_mandatory()))
-        #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
+        if type(assignment) == Homework:
+            print(assignment.get_name())
+            print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
+            print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
+            print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
+            print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
+            print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
+            print("     " + "Mandatory: " + str(assignment.get_mandatory()))
+            #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
+        elif type(assignment) == Exam:
+            print(assignment.get_name())
+            print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
+            print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
+            print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
+            print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
     except IndexError:
         print("That assignment doesn't exist!")
     
@@ -407,6 +423,7 @@ def edit(instruction):
         "pp1hr": edit_perc_1hr_personal,
         "delivery": edit_delivery_date,
         "ndelivery": edit_delivery_date_natma,
+        "pdelivery": edit_delivery_date_personal,
         "mand": edit_mandatory,
         "nmand": edit_mandatory_natma
     }
@@ -494,6 +511,12 @@ def edit_delivery_date_natma(instruction):
     delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
     natma.get_assignm_list()[assignm_index].set_delivery_date(delivery_date)
     save_in_natma_file()
+def edit_delivery_date_personal(instruction):
+    categ_index = int(instruction[0]) - 1
+    assignm_index = int(instruction[1]) - 1
+    delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
+    personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_delivery_date(delivery_date)
+    save_in_personal_file()
 def edit_mandatory(instruction):
     try:
         subj_index = int(instruction[0]) - 1

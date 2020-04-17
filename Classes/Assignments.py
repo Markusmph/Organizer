@@ -82,6 +82,8 @@ class Exam(Assignment):
         return True
     def get_time_to_finish(self):
         return self.time_to_study - self.perc_completed*self.time_to_study/100
+    def get_missing_perc(self):
+        return 100 - self.perc_completed
 
 
 class PersAssignment(Assignment):
