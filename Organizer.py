@@ -165,6 +165,7 @@ def display(instruction):
         "assignm": display_assignments,
         "subj": display_subj,
         "inor": display_in_order,
+        "mand": display_mand,
         #"display one": dislpay_one,
         "p": display_pers,
         "s": dislpay_one
@@ -291,6 +292,14 @@ def display_in_order(instruction):
                 print("")
         except IndexError:
             print("")
+
+def display_mand(instruction):
+    (assignments, subject_name) = ordered_list()
+    assignments.reverse()
+    subject_name.reverse()
+    for assignm in assignments:
+        if assignm.get_mandatory():
+            print(assignm.get_name() + " Delivery: " + str(assignm.get_delivery_date()))
 
 def display_pers(instruction):
     try:
@@ -569,6 +578,7 @@ def remove_from_school(instruction):
     assignm = int(instruction[1]) - 1
     del school.get_subj_list()[subj].get_assignm_list()[assignm]
     save_in_school_file()
+    display_subj(instruction)
 def remove_from_natma(instruction):
     i = int(instruction[0]) - 1
     del natma.get_assignm_list()[i]

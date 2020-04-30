@@ -1,6 +1,7 @@
 
 disp = display each subject with its corresponding assignment
 disp inor = display all assignments in order of delivery date
+disp mand = display all mandatory assignments
 
 disp assignm = display all assignments with its corresponding subject
 disp subj = display all subjects
