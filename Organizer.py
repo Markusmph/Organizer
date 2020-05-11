@@ -469,6 +469,7 @@ def edit_perc_completed(instruction):
             school.get_subj_list()[subj_index].create_completed_list()
             school.get_subj_list()[subj_index].set_as_completed(assignm_index)
             print("Completed list created!")
+    display_subj(instruction[0])
     save_in_school_file()
 def edit_perc_completed_natma(instruction):
     try:
@@ -498,11 +499,15 @@ def edit_perc_completed_personal(instruction):
         print("Please enter the full instruction:")
         print("     edit ppcomp <category index> <assignment index> <percentage>")
 def edit_perc_1hr(instruction):
-    subj_index = int(instruction[0]) - 1
-    assignm_index = int(instruction[1]) - 1
-    value = float(instruction[2])
-    school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_perc_in1hr(value)
-    save_in_school_file()
+    try:
+        subj_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
+        value = float(instruction[2])
+        school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_perc_in1hr(value)
+        save_in_school_file()
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("     edit p1hr <subject index> <assignment index> <new value>")
 def edit_perc_1hr_personal(instruction):
     categ_index = int(instruction[0]) - 1
     assignm_index = int(instruction[1]) - 1
