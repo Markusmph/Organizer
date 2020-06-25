@@ -167,6 +167,7 @@ def display(instruction):
         "inor": display_in_order,
         "mand": display_mand,
         #"display one": dislpay_one,
+        "n": display_natma,
         "p": display_pers,
         "s": dislpay_one
     }
@@ -300,6 +301,12 @@ def display_mand(instruction):
     for assignm in assignments:
         if assignm.get_mandatory():
             print(assignm.get_name() + " Delivery: " + str(assignm.get_delivery_date()))
+
+def display_natma(instruction):
+    i = 1
+    for assignm in natma.get_assignm_list():
+        print(str(i) + ") " + assignm.get_name())
+        i += 1
 
 def display_pers(instruction):
     try:
@@ -461,7 +468,7 @@ def edit_perc_completed(instruction):
     assignm_index = int(instruction[1]) - 1
     value = float(instruction[2])
     school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_completed(value)
-    if value == 100:
+    if value >= 100:
         try:
             school.get_subj_list()[subj_index].set_as_completed(assignm_index)
         except AttributeError:
@@ -479,6 +486,7 @@ def edit_perc_completed_natma(instruction):
         if value == 100:
             try:
                 natma.set_as_completed(assignm_index)
+                display_natma(instruction)
             except AttributeError:
                 print("Natma has no attribute completed, creating one...")
                 natma.create_completed_list()
@@ -579,11 +587,30 @@ def remove(instruction):
     else:
         print("Please use a valid noun")
 def remove_from_school(instruction):
-    subj = int(instruction[0]) - 1
-    assignm = int(instruction[1]) - 1
-    del school.get_subj_list()[subj].get_assignm_list()[assignm]
-    save_in_school_file()
-    display_subj(instruction)
+    try:
+        subj = int(instruction[0]) - 1
+        if len(instruction) == 2:
+            assignm = int(instruction[1]) - 1
+            del school.get_subj_list()[subj].get_assignm_list()[assignm]
+            save_in_school_file()
+            display_subj(instruction)
+        elif len(instruction) == 1:
+            confirmation = input("Are you sure you want to remove {0}? y/n: ".format(school.get_subj_list()[subj].get_name()))
+            while (confirmation != "y") and (confirmation != "n"):
+                confirmation = input("Are you sure you want to remove {0}? y/n: ".format(school.get_subj_list()[subj].get_name()))
+            if confirmation == "y":
+                del school.get_subj_list()[subj]
+                save_in_school_file()
+                print("Subject removed")
+            elif confirmation == "n":
+                print("Action cancelled")
+            display_subj([])
+        else:
+            print("Please enter the instruction as follows:")
+            print("     rem s <subject index>")
+    except IndexError:
+        print("Please enter the instruction as follows:")
+        print("     rem s <subject index>")
 def remove_from_natma(instruction):
     i = int(instruction[0]) - 1
     del natma.get_assignm_list()[i]

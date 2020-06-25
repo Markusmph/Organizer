@@ -7,6 +7,8 @@ disp assignm = display all assignments with its corresponding subject
 disp subj = display all subjects
 disp s <subject index> <assignment index> = display the information of an individual assignment
 
+disp n = display Natma assignments
+
 disp p <category index> = display a specific personal category with its assignments
 
 
@@ -37,6 +39,7 @@ add p <category index> <assignment name> = add assignment to a specific category
 
 
 rem s <subject index> <assignm index>  = remove an assignment from a specific subject from school list
+rem s <subject index> = remove a subject from school list
 
 rem n <index> = remove an assignment from natma
 
