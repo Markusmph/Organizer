@@ -206,18 +206,19 @@ def display_all():
         i += 1
 
     print("--------------------- PERSONAL -----------------------------")
-    i = 1
-    for categ in personal.get_categ_list():
-        print(str(i) + ") " + categ.get_name())
-        j = 1
-        for assignm in categ.get_assignm_list():
-            if assignm.get_mandatory():
-                mand = "Mandatory"
-            else:
-                mand = ""
-            print("     " + str(j) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "%" + " " + str(assignm.get_delivery_date()) + " " + mand)
-            j += 1
-        i += 1
+    display_pers([])
+    # i = 1
+    # for categ in personal.get_categ_list():
+    #     print(str(i) + ") " + categ.get_name())
+    #     j = 1
+    #     for assignm in categ.get_assignm_list():
+    #         if assignm.get_mandatory():
+    #             mand = "Mandatory"
+    #         else:
+    #             mand = ""
+    #         print("     " + str(j) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "%" + " " + str(assignm.get_delivery_date()) + " " + mand)
+    #         j += 1
+    #     i += 1
 
 def display_subj(instruction):
     if len(instruction) == 0:
@@ -310,21 +311,36 @@ def display_natma(instruction):
 
 def display_pers(instruction):
     try:
-        categ_index = int(instruction[0]) - 1
-        print(personal.get_categ_list()[categ_index].get_name() + ":")
-        print("---------------------------------------------------------")
-        i = 1
-        for assignm in personal.get_categ_list()[categ_index].get_assignm_list():
-            print("     " + str(i) + ") " + assignm.get_name())
-            if type(assignm) == PersAssignmentPeriodic:
-                assignm_type = "Periodic"
-            elif type(assignm) == PersAssignment:
-                assignm_type = "Non periodic"
-            print("          " + assignm_type)
-            i += 1
+        if len(instruction) == 0:
+            i = 1
+            for categ in personal.get_categ_list():
+                print(str(i) + ") " + categ.get_name())
+                j = 1
+                for assignm in categ.get_assignm_list():
+                    if assignm.get_mandatory():
+                        mand = "Mandatory"
+                    else:
+                        mand = ""
+                    print("     " + str(j) + ") " + assignm.get_name() + " | " + str(assignm.get_perc_completed()) + "%" + " " + str(assignm.get_delivery_date()) + " " + mand)
+                    j += 1
+                i += 1
+        elif len(instruction) >= 1:
+            categ_index = int(instruction[0]) - 1
+            print(personal.get_categ_list()[categ_index].get_name() + ":")
+            print("---------------------------------------------------------")
+            i = 1
+            for assignm in personal.get_categ_list()[categ_index].get_assignm_list():
+                print("     " + str(i) + ") " + assignm.get_name())
+                if type(assignm) == PersAssignmentPeriodic:
+                    assignm_type = "Periodic"
+                elif type(assignm) == PersAssignment:
+                    assignm_type = "Non periodic"
+                print("          " + assignm_type)
+                i += 1
     except IndexError:
         print("Not enough elements to the instruction")
         print("Please enter \"disp p <category index>\"")
+
 #----- display instruction ----
 
 #----- add instruction ----
@@ -350,7 +366,7 @@ def add_subject(instructions):
             name += (" " + instructions[i])
         new_subject = Subject(name)
         school.add_subj(new_subject)
-        save_in_school_file
+        save_in_school_file()
     except IndexError:
         print("Please enter the full instruction")
         print("     add s <subject name>")
