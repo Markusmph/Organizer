@@ -169,7 +169,8 @@ def display(instruction):
         #"display one": dislpay_one,
         "n": display_natma,
         "p": display_pers,
-        "s": dislpay_one
+        "s": dislpay_one,
+        "c": display_completed
     }
     if len(instruction) == 0:
         display_all()
@@ -330,16 +331,28 @@ def display_pers(instruction):
             print("---------------------------------------------------------")
             i = 1
             for assignm in personal.get_categ_list()[categ_index].get_assignm_list():
+                delivery = str(assignm.get_delivery_date())
                 print("     " + str(i) + ") " + assignm.get_name())
                 if type(assignm) == PersAssignmentPeriodic:
                     assignm_type = "Periodic"
                 elif type(assignm) == PersAssignment:
                     assignm_type = "Non periodic"
-                print("          " + assignm_type)
+                print("          " + assignm_type + " || " + delivery)
                 i += 1
     except IndexError:
         print("Not enough elements to the instruction")
         print("Please enter \"disp p <category index>\"")
+
+def display_completed(instruction):
+    try:
+        subj_index = int(instruction[0]) - 1
+        i = 1
+        for assignm in school.get_subj_list()[subj_index].get_completed_list():
+            print(str(i) + ") " + assignm.get_name())
+            i += 1
+    except IndexError:
+        print("Please enter the full instruction")
+        print("")
 
 #----- display instruction ----
 
@@ -472,13 +485,17 @@ def edit_name(instruction):
     school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_name(value)
     save_in_school_file()
 def edit_name_personal(instruction):
-    categ_index = int(instruction[0]) - 1
-    assignm_index = int(instruction[1]) - 1
-    value = instruction[2]
-    for i in range(3, len(instruction)):
-        value += " " + instruction[i]
-    personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_name(value)
-    save_in_personal_file()
+    try:
+        categ_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
+        value = instruction[2]
+        for i in range(3, len(instruction)):
+            value += " " + instruction[i]
+        personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_name(value)
+        save_in_personal_file()
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("edit pname <category index> <assignment index> <new name>")
 def edit_perc_completed(instruction):
     subj_index = int(instruction[0]) - 1
     assignm_index = int(instruction[1]) - 1

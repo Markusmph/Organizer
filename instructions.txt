@@ -6,6 +6,7 @@ disp mand = display all mandatory assignments
 disp assignm = display all assignments with its corresponding subject
 disp subj = display all subjects
 disp s <subject index> <assignment index> = display the information of an individual assignment
+disp c <subject index> = display the completed list of a specific subject
 
 disp n = display Natma assignments
 
