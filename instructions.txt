@@ -50,6 +50,8 @@ rem p <category index> <assignm index> = remove an assignment from a specific ca
 
 h <month> <day> = print how many hours remain to complete the assignments that have that date or before
 
+push s <subject index> <assignment index> = change the delivery date of a specific assignment from a specific subject form school list to the next day
+
 
 
 q = exit program

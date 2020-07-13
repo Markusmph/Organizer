@@ -497,20 +497,24 @@ def edit_name_personal(instruction):
         print("Please enter the full instruction:")
         print("edit pname <category index> <assignment index> <new name>")
 def edit_perc_completed(instruction):
-    subj_index = int(instruction[0]) - 1
-    assignm_index = int(instruction[1]) - 1
-    value = float(instruction[2])
-    school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_completed(value)
-    if value >= 100:
-        try:
-            school.get_subj_list()[subj_index].set_as_completed(assignm_index)
-        except AttributeError:
-            print("Subject has no attribute completed, creating one...")
-            school.get_subj_list()[subj_index].create_completed_list()
-            school.get_subj_list()[subj_index].set_as_completed(assignm_index)
-            print("Completed list created!")
-    display_subj(instruction[0])
-    save_in_school_file()
+    try:
+        subj_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
+        value = float(instruction[2])
+        school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_completed(value)
+        if value >= 100:
+            try:
+                school.get_subj_list()[subj_index].set_as_completed(assignm_index)
+            except AttributeError:
+                print("Subject has no attribute completed, creating one...")
+                school.get_subj_list()[subj_index].create_completed_list()
+                school.get_subj_list()[subj_index].set_as_completed(assignm_index)
+                print("Completed list created!")
+        display_subj(instruction[0])
+        save_in_school_file()
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("     edit pcomp <subject index> <assignment index> <new value>")
 def edit_perc_completed_natma(instruction):
     try:
         assignm_index = int(instruction[0]) - 1
@@ -667,6 +671,31 @@ def remove_categ_from_personal(instruction):
         print("     rem pc <category index>")
 #----- remove instruction ----
 
+#----- push instruction ----
+def push(instruction):
+    noun = instruction[0]
+    del instruction[0]
+    noun_dict = {
+        "s": push_school
+    }
+    if noun in noun_dict:
+        noun_dict[noun](instruction)
+    else:
+        print("Please use a valid noun")
+
+def push_school(instruction):
+    try:
+        subj_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
+        new_date = school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].get_delivery_date() + dt.timedelta(days=1)
+        school.get_subj_list()[subj_index].get_assignm_list()[assignm_index].set_delivery_date(new_date)
+        save_in_school_file()
+        display_subj(instruction)
+    except IndexError:
+        print("Please enter the full instrucion:")
+        print("     push s <subject index> <assignment index>")        
+#----- push instruction ----
+
 #----- remaining hours ----
 def remaining_hrs(instruction):
     try:
@@ -751,6 +780,7 @@ verb_dict = {
     "add": add,
     "edit": edit,
     "rem": remove,
+    "push": push,
     "h": remaining_hrs,
     "now": what_to_do,
     "help": get_instructions,
