@@ -676,7 +676,8 @@ def push(instruction):
     noun = instruction[0]
     del instruction[0]
     noun_dict = {
-        "s": push_school
+        "s": push_school,
+        "p": push_personal
     }
     if noun in noun_dict:
         noun_dict[noun](instruction)
@@ -693,7 +694,19 @@ def push_school(instruction):
         display_subj(instruction)
     except IndexError:
         print("Please enter the full instrucion:")
-        print("     push s <subject index> <assignment index>")        
+        print("     push s <subject index> <assignment index>")
+
+def push_personal(instruction):
+    try:
+        categ_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
+        new_date = personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].get_delivery_date() + dt.timedelta(days=1)
+        personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_delivery_date(new_date)
+        save_in_personal_file()
+        display_pers(instruction)
+    except IndexError:
+        print("Please enter the full instrucion:")
+        print("     push s <subject index> <assignment index>")
 #----- push instruction ----
 
 #----- remaining hours ----
