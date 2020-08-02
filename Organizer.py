@@ -159,6 +159,14 @@ def periodic_instructions():
     print("Every 2 days = 9")
 
 
+
+
+
+
+
+
+
+
 #----- display instruction ----
 def display(instruction):
     noun_dict = {
@@ -170,7 +178,8 @@ def display(instruction):
         "n": display_natma,
         "p": display_pers,
         "s": dislpay_one,
-        "c": display_completed
+        "c": display_completed,
+        "d": display_day
     }
     if len(instruction) == 0:
         display_all()
@@ -354,7 +363,36 @@ def display_completed(instruction):
         print("Please enter the full instruction")
         print("")
 
+def display_day(instrucion):
+    try:
+        month = int(instrucion[0])
+        day = int(instrucion[1])
+        
+        (assignments, subject_name) = ordered_list()
+        assignments.reverse()
+        subject_name.reverse()
+
+        for assignm in assignments:
+            if assignm.get_delivery_date() != dt.date(today.year, month, day):
+                del assignm
+            else:
+                delivery = str(assignm.get_delivery_date())
+                text = "Delivery: " + delivery + " "+ assignm.get_name()
+                print(text)
+        
+    except IndexError:
+        print("Please enter the full instruction")
+        print("")
+
 #----- display instruction ----
+
+
+
+
+
+
+
+
 
 #----- add instruction ----
 def add(instruction):

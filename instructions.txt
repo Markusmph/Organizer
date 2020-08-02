@@ -12,6 +12,8 @@ disp n = display Natma assignments
 
 disp p <category index> = display a specific personal category with its assignments
 
+disp d <month> <day> = display the assigments of a specific date
+
 
 edit name <subject index> <assignment index> <new name> = change name of a specific assignment
 edit pcomp <subject index> <assignment index> <new value> = change the percentage of the completion of a specific assignment
