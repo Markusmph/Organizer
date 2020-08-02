@@ -856,7 +856,7 @@ def push_day(instrucion):
 
         print(str(len(day_assignments)) + ": End pushing")
 
-        push_index = int(input("push : "))
+        push_index = int(input("push: "))
 
         while(push_index != len(day_assignments)):
             if day_assignments_list_name[push_index] == "School":
@@ -898,7 +898,7 @@ def push_day(instrucion):
 
             print("..................")
             print(str(len(day_assignments)) + ": End pushing")
-            push_index = int(input("push :"))
+            push_index = int(input("push: "))
 
     except IndexError:
         print("Please enter the full instruction")
