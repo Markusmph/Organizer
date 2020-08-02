@@ -54,6 +54,10 @@ h <month> <day> = print how many hours remain to complete the assignments that h
 
 push s <subject index> <assignment index> = change the delivery date of a specific assignment from a specific subject from school list to the next day
 push p <category index> <assignm index> = change the delivery date of a specific assignment from a specific category from personal list to the next day
+push n <assignm index> = change the delivery date of a specific assignment from natma list to the next day
+
+
+push d <month> <day> = select which assignments to push from a specific date
 
 
 

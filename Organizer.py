@@ -145,6 +145,47 @@ def order_list(list_to_order, list_with_parameter):
                 j += 1
     return list_to_order
 
+def assignments_orderd():
+    # Function that returns 4 lists: assignments, list, category index, assignment index
+    assignments = []
+    list_name = []
+    category_index = []
+    assignm_index = []
+
+    # delivery_dates = []
+    for subj in school.get_subj_list():
+        for assignm in subj.get_assignm_list():
+            assignments.append(assignm)
+            list_name.append("School")
+            category_index.append(school.get_subj_list().index(subj))
+            assignm_index.append(subj.get_assignm_list().index(assignm))
+
+    for assignm in natma.get_assignm_list():
+        assignments.append(assignm)
+        list_name.append("Natma")
+        category_index.append(0)
+        assignm_index.append(natma.get_assignm_list().index(assignm))
+
+    for categ in personal.get_categ_list():
+        for assignm in categ.get_assignm_list():
+            assignments.append(assignm)
+            list_name.append("Personal")
+            category_index.append(personal.get_categ_list().index(categ))
+            assignm_index.append(categ.get_assignm_list().index(assignm))
+
+    for i in range(1, len(assignments)):
+        j = i
+        while j < len(assignments):
+            if assignments[i-1].get_delivery_date() > assignments[j].get_delivery_date():
+                (assignments[i-1], assignments[j]) = (assignments[j], assignments[i-1])
+                (list_name[i-1], list_name[j]) = (list_name[j], list_name[i-1])
+                (category_index[i-1], category_index[j]) = (category_index[j], category_index[i-1])
+                (assignm_index[i-1], assignm_index[j]) = (assignm_index[j], assignm_index[i-1])
+                j = i
+            else:
+                j += 1
+    return (assignments, list_name, category_index, assignm_index)
+
 
 def periodic_instructions():
     print("Every day = 0")
@@ -157,7 +198,6 @@ def periodic_instructions():
     print("Sunday = 7")
     print("Every month = 8")
     print("Every 2 days = 9")
-
 
 
 
@@ -382,7 +422,7 @@ def display_day(instrucion):
         
     except IndexError:
         print("Please enter the full instruction")
-        print("")
+        print("disp d <month> <day>")
 
 #----- display instruction ----
 
@@ -491,6 +531,13 @@ def add_personal_assignment(instruction):
         print("Please enter the complete instruction: ")
         print("     add p <category index> <assignment name>")
 #----- add instruction ----
+
+
+
+
+
+
+
 
 #----- edit instruction ----
 def edit(instruction):
@@ -647,6 +694,12 @@ def edit_mandatory_natma(instruction):
     save_in_natma_file()
 #----- edit instruction ----
 
+
+
+
+
+
+
 #----- remove instruction ----
 def remove(instruction):
     noun_dict = {
@@ -709,13 +762,24 @@ def remove_categ_from_personal(instruction):
         print("     rem pc <category index>")
 #----- remove instruction ----
 
+
+
+
+
+
+
+
+
+
 #----- push instruction ----
 def push(instruction):
     noun = instruction[0]
     del instruction[0]
     noun_dict = {
         "s": push_school,
-        "p": push_personal
+        "p": push_personal,
+        "n": push_natma,
+        "d": push_day
     }
     if noun in noun_dict:
         noun_dict[noun](instruction)
@@ -734,6 +798,17 @@ def push_school(instruction):
         print("Please enter the full instrucion:")
         print("     push s <subject index> <assignment index>")
 
+def push_natma(instruction):
+    try:
+        assignm_index = int(instruction[0]) - 1
+        new_date = natma.get_assignm_list()[assignm_index].get_delivery_date() + dt.timedelta(days=1)
+        natma.get_assignm_list()[assignm_index].set_delivery_date(new_date)
+        save_in_natma_file()
+        display_natma(instruction)
+    except IndexError:
+        print("Please enter the full instrucion:")
+        print("    push n <assignm index>")
+
 def push_personal(instruction):
     try:
         categ_index = int(instruction[0]) - 1
@@ -745,7 +820,98 @@ def push_personal(instruction):
     except IndexError:
         print("Please enter the full instrucion:")
         print("     push s <subject index> <assignment index>")
+
+def push_day(instrucion):
+    try:
+        month = int(instrucion[0])
+        day = int(instrucion[1])
+        
+        # Function that returns 4 lists: assignments, list, category index, assignment index
+        (assignments, list_name, category_index, assignm_index) = assignments_orderd()
+
+        day_assignments = []
+        day_assignments_list_name = []
+        day_category_index = []
+        day_assignm_index = []
+
+        for assignm in assignments:
+            index = assignments.index(assignm)
+            if assignm.get_delivery_date() == dt.date(today.year, month, day):
+                day_assignments.append(assignm)
+                day_assignments_list_name.append(list_name[index])
+                day_category_index.append(category_index[index])
+                day_assignm_index.append(assignm_index[index])
+
+        day_assignments.reverse()
+        day_assignments_list_name.reverse()
+        day_category_index.reverse()
+        day_assignm_index.reverse()
+
+        print("--------------------------")
+        for assignm in day_assignments:
+            index = day_assignments.index(assignm)
+            delivery = str(assignm.get_delivery_date())
+            text = str(index) + ": Delivery: " + delivery + " "+ assignm.get_name() + " | " + day_assignments_list_name[index]
+            print(text)
+
+        print(str(len(day_assignments)) + ": End pushing")
+
+        push_index = int(input("push : "))
+
+        while(push_index != len(day_assignments)):
+            if day_assignments_list_name[push_index] == "School":
+                push_school([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
+            elif day_assignments_list_name[push_index] == "Natma":
+                push_natma([day_assignm_index[push_index] + 1])
+            elif day_assignments_list_name[push_index] == "Personal":
+                push_personal([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
+            else:
+                print("Unknown list")
+                break
+
+            (assignments, list_name, category_index, assignm_index) = assignments_orderd()
+
+            day_assignments = []
+            day_assignments_list_name = []
+            day_category_index = []
+            day_assignm_index = []
+
+            for assignm in assignments:
+                index = assignments.index(assignm)
+                if assignm.get_delivery_date() == dt.date(today.year, month, day):
+                    day_assignments.append(assignm)
+                    day_assignments_list_name.append(list_name[index])
+                    day_category_index.append(category_index[index])
+                    day_assignm_index.append(assignm_index[index])
+
+            day_assignments.reverse()
+            day_assignments_list_name.reverse()
+            day_category_index.reverse()
+            day_assignm_index.reverse()
+
+            print("--------------------------")
+            for assignm in day_assignments:
+                index = day_assignments.index(assignm)
+                delivery = str(assignm.get_delivery_date())
+                text = str(index) + ": Delivery: " + delivery + " "+ assignm.get_name() + " | " + day_assignments_list_name[index]
+                print(text)
+
+            print("..................")
+            print(str(len(day_assignments)) + ": End pushing")
+            push_index = int(input("push :"))
+
+    except IndexError:
+        print("Please enter the full instruction")
+        print("push d <month> <day>")
 #----- push instruction ----
+
+
+
+
+
+
+
+
 
 #----- remaining hours ----
 def remaining_hrs(instruction):
@@ -777,6 +943,14 @@ def remaining_hrs(instruction):
         print("Not enough data")
 
 #----- remaining hours ----
+
+
+
+
+
+
+
+
 
 #----- What to do ----
 def what_to_do(instruction):
