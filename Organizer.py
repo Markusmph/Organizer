@@ -854,6 +854,7 @@ def push_day(instrucion):
             text = str(index) + ": Delivery: " + delivery + " "+ assignm.get_name() + " | " + day_assignments_list_name[index]
             print(text)
 
+        print("..................")
         print(str(len(day_assignments)) + ": End pushing")
 
         push_index = int(input("push: "))
