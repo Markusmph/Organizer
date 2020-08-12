@@ -56,12 +56,15 @@ def get_input():
 
 def run_instruc(instruction):
     # noun, subj_index, assignm_index, value
-    verb = instruction[0]
-    del instruction[0]
-    if verb in verb_dict:
-        verb_dict[verb](instruction)
-    else:
-        print("{0} is not a programmed instruction.".format(verb))
+    try:
+        verb = instruction[0]
+        del instruction[0]
+        if verb in verb_dict:
+            verb_dict[verb](instruction)
+        else:
+            print("{0} is not a programmed instruction.".format(verb))
+    except IndexError:
+        print("Please enter an instruction")
 
 def decimal_to_time(value):
     hours = int(value)
@@ -279,7 +282,7 @@ def display_subj(instruction):
     elif len(instruction) >= 1:
         subj_index = int(instruction[0]) - 1
         subj = school.get_subj_list()[subj_index]
-        print(subj.get_name())
+        print(str(instruction[0]) + ") " + subj.get_name())
         print("------------------------------")
         i = 1
         for assignm in subj.get_assignm_list():
@@ -595,7 +598,7 @@ def edit_perc_completed(instruction):
                 school.get_subj_list()[subj_index].create_completed_list()
                 school.get_subj_list()[subj_index].set_as_completed(assignm_index)
                 print("Completed list created!")
-        display_subj(instruction[0])
+        display_subj(str(subj_index + 1))
         save_in_school_file()
     except IndexError:
         print("Please enter the full instruction:")
