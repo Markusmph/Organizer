@@ -598,7 +598,7 @@ def edit_perc_completed(instruction):
                 school.get_subj_list()[subj_index].create_completed_list()
                 school.get_subj_list()[subj_index].set_as_completed(assignm_index)
                 print("Completed list created!")
-        display_subj(str(subj_index + 1))
+        display_subj(instruction)
         save_in_school_file()
     except IndexError:
         print("Please enter the full instruction:")
