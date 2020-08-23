@@ -214,13 +214,13 @@ def periodic_instructions():
 def display(instruction):
     noun_dict = {
         "assignm": display_assignments,
-        "subj": display_subj,
+        "s": display_subj,
         "inor": display_in_order,
         "mand": display_mand,
         #"display one": dislpay_one,
         "n": display_natma,
         "p": display_pers,
-        "s": dislpay_one,
+        # "s": dislpay_one,
         "c": display_completed,
         "d": display_day
     }
@@ -279,7 +279,7 @@ def display_subj(instruction):
         for subject in range(len(school.subj_list)):
             print(str(i) + ") " + school.subj_list[subject].name)
             i += 1
-    elif len(instruction) >= 1:
+    elif len(instruction) == 1:
         subj_index = int(instruction[0]) - 1
         subj = school.get_subj_list()[subj_index]
         print(str(instruction[0]) + ") " + subj.get_name())
@@ -288,34 +288,63 @@ def display_subj(instruction):
         for assignm in subj.get_assignm_list():
             print(str(i) + ") " + assignm.get_name() + " Delivery: " + str(assignm.get_delivery_date()))
             i += 1
+    elif len(instruction) == 2:
+        i = int(instruction[0]) - 1
+        j = int(instruction[1]) - 1
+        try:
+            assignment = school.get_subj_list()[i].get_assignm_list()[j]
+            if type(assignment) == Homework:
+                print(assignment.get_name())
+                print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
+                print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
+                print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
+                print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
+                print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
+                print("     " + "Mandatory: " + str(assignment.get_mandatory()))
+                #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
+            elif type(assignment) == Exam:
+                print(assignment.get_name())
+                print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
+                print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
+                print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
+                print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
+        except IndexError:
+            print("That assignment doesn't exist!")
+    else:
+        print("Please enter one of the instructions:")
+        print("     disp s")
+        print("     disp s <subject index>")
+        print("     disp s <subject index> <assignment index>")
+
 def display_assignments(instrucion):
     i = 1
     for subj in school.get_subj_list():
         for assignm in subj.get_assignm_list():
             print(str(i) + ") " + assignm.get_name() + " - " + subj.get_name())
             i += 1
-def dislpay_one(instrucion):
-    i = int(instrucion[0]) - 1
-    j = int(instrucion[1]) - 1
-    try:
-        assignment = school.get_subj_list()[i].get_assignm_list()[j]
-        if type(assignment) == Homework:
-            print(assignment.get_name())
-            print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
-            print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
-            print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
-            print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
-            print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
-            print("     " + "Mandatory: " + str(assignment.get_mandatory()))
-            #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
-        elif type(assignment) == Exam:
-            print(assignment.get_name())
-            print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
-            print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
-            print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
-            print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
-    except IndexError:
-        print("That assignment doesn't exist!")
+
+# def dislpay_one(instrucion):
+#     i = int(instrucion[0]) - 1
+#     j = int(instrucion[1]) - 1
+#     try:
+#         assignment = school.get_subj_list()[i].get_assignm_list()[j]
+#         if type(assignment) == Homework:
+#             print(assignment.get_name())
+#             print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
+#             print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
+#             print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
+#             print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
+#             print("     " + "Percentage completed in 1 hour: " + str(assignment.get_perc_in1hr()) + "% in 1 hour")
+#             print("     " + "Mandatory: " + str(assignment.get_mandatory()))
+#             #print("     " + "Days remaining to delivery: " + str(assignment.get_days_remaining()))
+#         elif type(assignment) == Exam:
+#             print(assignment.get_name())
+#             print("     " + "Delivery date: " + str(assignment.get_delivery_date()))
+#             print("     " + "Percentage completed: " + str(assignment.get_perc_completed()) + "%")
+#             print("     " + "Percentage missing: " + str(assignment.get_missing_perc()) + "%")
+#             print("     " + "Time remaining: " + str(assignment.get_time_to_finish()) + " hours")
+#     except IndexError:
+#         print("That assignment doesn't exist!")
     
 def display_in_order(instruction):
     (assignments, subject_name) = ordered_list()
@@ -598,7 +627,7 @@ def edit_perc_completed(instruction):
                 school.get_subj_list()[subj_index].create_completed_list()
                 school.get_subj_list()[subj_index].set_as_completed(assignm_index)
                 print("Completed list created!")
-        display_subj(instruction)
+        display_subj([instruction[0]])
         save_in_school_file()
     except IndexError:
         print("Please enter the full instruction:")
@@ -724,7 +753,7 @@ def remove_from_school(instruction):
             assignm = int(instruction[1]) - 1
             del school.get_subj_list()[subj].get_assignm_list()[assignm]
             save_in_school_file()
-            display_subj(instruction)
+            display_subj([instruction[0]])
         elif len(instruction) == 1:
             confirmation = input("Are you sure you want to remove {0}? y/n: ".format(school.get_subj_list()[subj].get_name()))
             while (confirmation != "y") and (confirmation != "n"):
