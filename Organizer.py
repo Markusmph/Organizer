@@ -148,7 +148,7 @@ def order_list(list_to_order, list_with_parameter):
                 j += 1
     return list_to_order
 
-def assignments_orderd():
+def assignments_ordered():
     # Function that returns 4 lists: assignments, list, category index, assignment index
     assignments = []
     list_name = []
@@ -222,7 +222,8 @@ def display(instruction):
         "p": display_pers,
         # "s": dislpay_one,
         "c": display_completed,
-        "d": display_day
+        "d": display_day,
+        "r": display_rules
     }
     if len(instruction) == 0:
         display_all()
@@ -458,7 +459,13 @@ def display_day(instrucion):
 
 #----- display instruction ----
 
-
+#----- display rules ----
+def display_rules(instruction):
+    print("1. Hacer cada tarea con pomodoros")
+    print("2. Si algo no urge, alternar entre lo que se entrega próximamente y lo que está en la lista, de lo contrario,")
+    print("se perderá mucho tiempo")
+    print("3. Son más importantes las tareas individuales que las de equipo")
+#----- display rules ----
 
 
 
@@ -859,7 +866,7 @@ def push_day(instrucion):
         day = int(instrucion[1])
         
         # Function that returns 4 lists: assignments, list, category index, assignment index
-        (assignments, list_name, category_index, assignm_index) = assignments_orderd()
+        (assignments, list_name, category_index, assignm_index) = assignments_ordered()
 
         day_assignments = []
         day_assignments_list_name = []
@@ -902,7 +909,7 @@ def push_day(instrucion):
                 print("Unknown list")
                 break
 
-            (assignments, list_name, category_index, assignm_index) = assignments_orderd()
+            (assignments, list_name, category_index, assignm_index) = assignments_ordered()
 
             day_assignments = []
             day_assignments_list_name = []

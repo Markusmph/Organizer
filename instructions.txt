@@ -14,6 +14,8 @@ disp p <category index> = display a specific personal category with its assignme
 
 disp d <month> <day> = display the assigments of a specific date
 
+disp r = display rules
+
 
 edit name <subject index> <assignment index> <new name> = change name of a specific assignment
 edit pcomp <subject index> <assignment index> <new value> = change the percentage of the completion of a specific assignment
