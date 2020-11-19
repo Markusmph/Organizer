@@ -462,8 +462,8 @@ def display_day(instrucion):
 #----- display rules ----
 def display_rules(instruction):
     print("1. Hacer cada tarea con pomodoros")
-    print("2. Si algo no urge, alternar entre lo que se entrega próximamente y lo que está en la lista, de lo contrario,")
-    print("se perderá mucho tiempo")
+    print("2. Si algo no urge, alternar entre lo que se entrega próximamente (LO QUE SE ENTREGA) y lo que está en la lista, ")
+    print("de lo contrario, se perderá mucho tiempo")
     print("3. Son más importantes las tareas individuales que las de equipo")
 #----- display rules ----
 
