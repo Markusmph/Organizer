@@ -436,17 +436,22 @@ def display_completed(instruction):
         print("Please enter the full instruction")
         print("")
 
-def display_day(instrucion):
+def display_day(instruction):
     try:
-        month = int(instrucion[0])
-        day = int(instrucion[1])
+        if(len(instruction) == 2):
+            year = today.year
+        elif(len(instruction) == 3):
+            year = int(instruction[2])
+
+        month = int(instruction[0])
+        day = int(instruction[1])
         
         (assignments, subject_name) = ordered_list()
         assignments.reverse()
         subject_name.reverse()
 
         for assignm in assignments:
-            if assignm.get_delivery_date() != dt.date(today.year, month, day):
+            if assignm.get_delivery_date() != dt.date(year, month, day):
                 del assignm
             else:
                 delivery = str(assignm.get_delivery_date())
@@ -456,6 +461,8 @@ def display_day(instrucion):
     except IndexError:
         print("Please enter the full instruction")
         print("disp d <month> <day>")
+        print("or")
+        print("disp d <month> <day> <year>")
 
 #----- display instruction ----
 
@@ -500,34 +507,68 @@ def add_subject(instructions):
     except IndexError:
         print("Please enter the full instruction")
         print("     add s <subject name>")
+
 def add_homework(instruction):
-    subj_index = instruction[0]
-    name = input("Name: ")
-    delivery_date = dt.date(today.year, int(input("Month of delivery: ")), int(input("Day of delivery: ")))
-    p1hr = float(input("Percentage done in 1 hour: "))
-    assignment = Homework(name, delivery_date, p1hr)
-    school.get_subj_list()[int(subj_index)-1].add_assignm(assignment)
-    save_in_school_file()
+    try:
+        if(len(instruction) == 1):
+            year = today.year
+        elif(len(instruction) == 2):
+            year = int(instruction[1])
+
+        subj_index = instruction[0]
+        name = input("Name: ")
+        delivery_date = dt.date(year, int(input("Month of delivery: ")), int(input("Day of delivery: ")))
+        p1hr = float(input("Percentage done in 1 hour: "))
+        assignment = Homework(name, delivery_date, p1hr)
+        school.get_subj_list()[int(subj_index)-1].add_assignm(assignment)
+        save_in_school_file()
+
+    except IndexError:
+        print("Not enough elements to the instruction")
+        print("Please enter \"add hw <subject index>\"")
+        print("or")
+        print("\"add hw <subject index> <year>\"")
+
 def add_natma(instruction):
-    name = input("Name: ")
-    delivery_date = dt.date(today.year, int(input("Month: ")), int(input("Day: ")))
-    perc1hr = float(input("Percentage in 1 hour: "))
-    new_assignm = Homework(name, delivery_date, perc1hr)
-    natma.add_assignm(new_assignm)
-    save_in_natma_file()
+    try:
+        if(len(instruction) == 0):
+            year = today.year
+        elif(len(instruction) == 1):
+            year = int(instruction[0])
+
+        name = input("Name: ")
+        delivery_date = dt.date(year, int(input("Month: ")), int(input("Day: ")))
+        perc1hr = float(input("Percentage in 1 hour: "))
+        new_assignm = Homework(name, delivery_date, perc1hr)
+        natma.add_assignm(new_assignm)
+        save_in_natma_file()
+
+    except IndexError:
+        print("Not enough elements to the instruction")
+        print("Please enter \"add n <subject index>\"")
+        print("or")
+        print("\"add n <year>\"")
+
 def add_exam(instruction):
     try:
+        if(len(instruction) == 1):
+            year = today.year
+        elif(len(instruction) == 2):
+            year = int(instruction[1])
+
         subj_index = instruction[0]
-        name = instruction[1]
-        for i in range(2, len(instruction)):
-            name += " " + instruction[i]
-        date = dt.date(today.year, int(input("Month: ")), int(input("Day: ")))
+        name = input("Name: ")
+        date = dt.date(year, int(input("Month: ")), int(input("Day: ")))
         exam = Exam(name, date)
         school.get_subj_list()[int(subj_index)-1].add_assignm(exam)
         save_in_school_file()
+
     except IndexError:
         print("Not enough elements to the instruction")
-        print("Please enter \"add e <subject index> <name of the exam>\"")
+        print("Please enter \"add e <subject index>\"")
+        print("or")
+        print("Please enter \"add e <subject index> <year>\"")
+
 def add_personal_categ(instruction):
     try:
         value = instruction[0]
@@ -541,10 +582,13 @@ def add_personal_categ(instruction):
         print("     add pc <category name>")
 def add_personal_assignment(instruction):
     try:
+        if(len(instruction) == 1):
+            year = today.year
+        elif(len(instruction) == 2):
+            year = int(instruction[1])
+
         value = int(instruction[0]) - 1
-        name = instruction[1]
-        for i in range(2, len(instruction)):
-            name += " {0}".format(instruction[i])
+        name = input("Name: ")
         p_input = input("Periodic? (y/n) ")
         if p_input == "True" or p_input == "true" or p_input == "t" or p_input == "yes" or p_input == "y" or p_input == "Y":
             periodic_instructions()
@@ -554,21 +598,23 @@ def add_personal_assignment(instruction):
             personal.get_categ_list()[value].add_assignm(new_assingm)
             save_in_personal_file()
         elif p_input == "False" or p_input == "false" or p_input == "f" or p_input == "no" or p_input == "n" or p_input == "N":
-            delivery_date = dt.date(today.year, int(input("Month: ")), int(input("Day: ")))
+            delivery_date = dt.date(year, int(input("Month: ")), int(input("Day: ")))
             perc_in1hr = float(input("Percentage done in 1 hour: "))
             new_assignm = PersAssignment(name, delivery_date, perc_in1hr)
             personal.get_categ_list()[value].add_assignm(new_assignm)
             save_in_personal_file()
         else:
             print("Creating a non-periodic assignment...")
-            delivery_date = dt.date(today.year, int(input("Month: ")), int(input("Day: ")))
+            delivery_date = dt.date(year, int(input("Month: ")), int(input("Day: ")))
             perc_in1hr = float(input("Percentage done in 1 hour: "))
             new_assignm = PersAssignment(name, delivery_date, perc_in1hr)
             personal.get_categ_list()[value].add_assignm(new_assignm)
             save_in_personal_file()
-    except IndexError:
+    except (IndexError, ValueError):
         print("Please enter the complete instruction: ")
-        print("     add p <category index> <assignment name>")
+        print("     add p <category index>")
+        print("     or")
+        print("     add p <category index> <year>")
 #----- add instruction ----
 
 
@@ -617,7 +663,7 @@ def edit_name_personal(instruction):
             value += " " + instruction[i]
         personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_name(value)
         save_in_personal_file()
-    except IndexError:
+    except (IndexError, ValueError):
         print("Please enter the full instruction:")
         print("edit pname <category index> <assignment index> <new name>")
 def edit_perc_completed(instruction):
@@ -684,22 +730,61 @@ def edit_perc_1hr_personal(instruction):
     personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_perc_in1hr(value)
     save_in_personal_file()
 def edit_delivery_date(instruction):
-    subj_index = instruction[0]
-    assignm_index = instruction[1]
-    delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
-    school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_delivery_date(delivery_date)
-    save_in_school_file()
+    try:
+        if(len(instruction) == 2):
+            year = dt.datetime.now().year
+        elif(len(instruction) == 3):
+            year = int(instruction[2])
+
+        subj_index = instruction[0]
+        assignm_index = instruction[1]
+        delivery_date = dt.date(year, int(input("Month: ")), int(input("Day: ")))
+        school.get_subj_list()[int(subj_index)-1].get_assignm_list()[int(assignm_index)-1].set_delivery_date(delivery_date)
+        save_in_school_file()
+
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("     edit delivery <subject index> <assignment index>")
+        print("     or")
+        print("     edit delivery <subject index> <assignment index> <year>")
+
 def edit_delivery_date_natma(instruction):
-    assignm_index = int(instruction[0]) - 1
-    delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
-    natma.get_assignm_list()[assignm_index].set_delivery_date(delivery_date)
-    save_in_natma_file()
+    try:
+        if(len(instruction) == 1):
+            year = dt.datetime.now().year
+        elif(len(instruction) == 2):
+            year = int(instruction[1])
+
+        assignm_index = int(instruction[0]) - 1
+        delivery_date = dt.date(year, int(input("Month: ")), int(input("Day: ")))
+        natma.get_assignm_list()[assignm_index].set_delivery_date(delivery_date)
+        save_in_natma_file()
+    
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("     edit ndelivery <assignment index>")
+        print("     or")
+        print("     edit ndelivery <assignment index> <year>")
+
 def edit_delivery_date_personal(instruction):
-    categ_index = int(instruction[0]) - 1
-    assignm_index = int(instruction[1]) - 1
-    delivery_date = dt.date(dt.datetime.now().year, int(input("Month: ")), int(input("Day: ")))
-    personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_delivery_date(delivery_date)
-    save_in_personal_file()
+    try:
+        if(len(instruction) == 2):
+            year = dt.datetime.now().year
+        elif(len(instruction) == 3):
+            year = int(instruction[2])
+
+        categ_index = int(instruction[0]) - 1
+        assignm_index = int(instruction[1]) - 1
+        delivery_date = dt.date(year, int(input("Month: ")), int(input("Day: ")))
+        personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index].set_delivery_date(delivery_date)
+        save_in_personal_file()
+
+    except IndexError:
+        print("Please enter the full instruction:")
+        print("     edit pdelivery <category index> <assignment index>")
+        print("     or")
+        print("     edit pdelivery <category index> <assignment index> <year>")
+
 def edit_mandatory(instruction):
     try:
         subj_index = int(instruction[0]) - 1
@@ -860,10 +945,15 @@ def push_personal(instruction):
         print("Please enter the full instrucion:")
         print("     push s <subject index> <assignment index>")
 
-def push_day(instrucion):
+def push_day(instruction):
     try:
-        month = int(instrucion[0])
-        day = int(instrucion[1])
+        if(len(instruction) == 2):
+            year = today.year
+        elif(len(instruction) == 3):
+            year = int(instruction[2])
+
+        month = int(instruction[0])
+        day = int(instruction[1])
         
         # Function that returns 4 lists: assignments, list, category index, assignment index
         (assignments, list_name, category_index, assignm_index) = assignments_ordered()
@@ -875,7 +965,7 @@ def push_day(instrucion):
 
         for assignm in assignments:
             index = assignments.index(assignm)
-            if assignm.get_delivery_date() == dt.date(today.year, month, day):
+            if assignm.get_delivery_date() == dt.date(year, month, day):
                 day_assignments.append(assignm)
                 day_assignments_list_name.append(list_name[index])
                 day_category_index.append(category_index[index])
@@ -918,7 +1008,7 @@ def push_day(instrucion):
 
             for assignm in assignments:
                 index = assignments.index(assignm)
-                if assignm.get_delivery_date() == dt.date(today.year, month, day):
+                if assignm.get_delivery_date() == dt.date(year, month, day):
                     day_assignments.append(assignm)
                     day_assignments_list_name.append(list_name[index])
                     day_category_index.append(category_index[index])
@@ -942,7 +1032,7 @@ def push_day(instrucion):
 
     except IndexError:
         print("Please enter the full instruction")
-        print("push d <month> <day>")
+        print("     push d <month> <day>")
 #----- push instruction ----
 
 
@@ -956,6 +1046,11 @@ def push_day(instrucion):
 #----- remaining hours ----
 def remaining_hrs(instruction):
     try:
+        if(len(instruction) == 2):
+            year = today.year
+        elif(len(instruction) == 3):
+            year = int(instruction[2])
+
         month = int(instruction[0])
         day = int(instruction[1])
         (assignments, subj_name) = ordered_list()
@@ -964,7 +1059,7 @@ def remaining_hrs(instruction):
         time_mandatory = 0
         time_non_mandatory = 0
         for assignm in assignments:
-            if assignm.get_delivery_date() <= dt.date(today.year, month, day):
+            if assignm.get_delivery_date() <= dt.date(year, month, day):
                 if assignm.get_mandatory():
                     time_mandatory += assignm.get_time_to_finish()
                 elif not assignm.get_mandatory():

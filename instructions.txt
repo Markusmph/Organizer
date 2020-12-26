@@ -13,6 +13,7 @@ disp n = display Natma assignments
 disp p <category index> = display a specific personal category with its assignments
 
 disp d <month> <day> = display the assigments of a specific date
+disp d <month> <day> <year> = display the assigments of a specific date
 
 disp r = display rules
 
@@ -35,12 +36,16 @@ edit pdelivery <category index> <assignment index> = change the delivery date of
 
 add s <subject name> = add a new subject
 add hw <subject index> = add homework to specific subject
+add hw <subject index> <year> = add homework to specific subject
 add e <subject index> = add exam to a specific subject
+add e <subject index> <year> = add exam to a specific subject
 
 add n = add homework to natma
+add n <year> = add homework to natma
 
 add pc <category name> = add a personal category
-add p <category index> <assignment name> = add assignment to a specific category
+add p <category index> = add assignment to a specific category
+add p <category index> <year> = add assignment to a specific category
 
 
 rem s <subject index> <assignm index>  = remove an assignment from a specific subject from school list
@@ -53,6 +58,7 @@ rem p <category index> <assignm index> = remove an assignment from a specific ca
 
 
 h <month> <day> = print how many hours remain to complete the assignments that have that date or before
+h <month> <day> <year> = print how many hours remain to complete the assignments that have that date or before
 
 push s <subject index> <assignment index> = change the delivery date of a specific assignment from a specific subject from school list to the next day
 push p <category index> <assignm index> = change the delivery date of a specific assignment from a specific category from personal list to the next day
@@ -60,6 +66,7 @@ push n <assignm index> = change the delivery date of a specific assignment from 
 
 
 push d <month> <day> = select which assignments to push from a specific date
+push d <month> <day> <year> = select which assignments to push from a specific date
 
 
 
