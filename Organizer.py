@@ -610,7 +610,7 @@ def add_personal_assignment(instruction):
             new_assignm = PersAssignment(name, delivery_date, perc_in1hr)
             personal.get_categ_list()[value].add_assignm(new_assignm)
             save_in_personal_file()
-    except (IndexError, ValueError):
+    except (IndexError, ValueError, UnboundLocalError):
         print("Please enter the complete instruction: ")
         print("     add p <category index>")
         print("     or")
@@ -903,7 +903,8 @@ def push(instruction):
         "s": push_school,
         "p": push_personal,
         "n": push_natma,
-        "d": push_day
+        "d": push_day,
+        "a": push_all_day
     }
     if noun in noun_dict:
         noun_dict[noun](instruction)
@@ -1030,7 +1031,54 @@ def push_day(instruction):
             print(str(len(day_assignments)) + ": End pushing")
             push_index = int(input("push: "))
 
-    except IndexError:
+    except (IndexError, ValueError):
+        print("Please enter the full instruction")
+        print("     push d <month> <day>")
+
+def push_all_day(instruction):
+    try:
+        if(len(instruction) == 2):
+            year = today.year
+        elif(len(instruction) == 3):
+            year = int(instruction[2])
+
+        month = int(instruction[0])
+        day = int(instruction[1])
+        
+        # Function that returns 4 lists: assignments, list, category index, assignment index
+        (assignments, list_name, category_index, assignm_index) = assignments_ordered()
+
+        day_assignments = []
+        day_assignments_list_name = []
+        day_category_index = []
+        day_assignm_index = []
+
+        for assignm in assignments:
+            index = assignments.index(assignm)
+            if assignm.get_delivery_date() == dt.date(year, month, day):
+                day_assignments.append(assignm)
+                day_assignments_list_name.append(list_name[index])
+                day_category_index.append(category_index[index])
+                day_assignm_index.append(assignm_index[index])
+
+        day_assignments.reverse()
+        day_assignments_list_name.reverse()
+        day_category_index.reverse()
+        day_assignm_index.reverse()
+
+        for assignm in day_assignments:
+            push_index = day_assignments.index(assignm)
+            if day_assignments_list_name[push_index] == "School":
+                push_school([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
+            elif day_assignments_list_name[push_index] == "Natma":
+                push_natma([day_assignm_index[push_index] + 1])
+            elif day_assignments_list_name[push_index] == "Personal":
+                push_personal([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
+            else:
+                print("Unknown list")
+                break
+            
+    except (IndexError):
         print("Please enter the full instruction")
         print("     push d <month> <day>")
 #----- push instruction ----
