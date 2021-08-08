@@ -349,12 +349,31 @@ def display_assignments(instrucion):
     
 def display_in_order(instruction):
     (assignments, subject_name) = ordered_list()
-    i = 0
     assignments.reverse()
     subject_name.reverse()
+    i = 0
+    i_subj = 0
+    i_day = 1
+    day = str(assignments[0].get_delivery_date())
+    total_time = 0
+
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
-        delivery = str(assignm.get_delivery_date())
+        assignm_delivery = str(assignm.get_delivery_date())
+
+        if assignm_delivery == day:
+            # Sumar horas
+            total_time += assignm.get_time_to_finish()
+        else:
+            (hours_day, minutes_day) = decimal_to_time(total_time)
+            print("Hours: " + str(hours_day))
+            print("Minutes: " + str(minutes_day))
+            print("")
+            i = 0
+            i_day = 1
+            day = assignm_delivery
+            total_time = assignm.get_time_to_finish()
+
         if assignm.get_mandatory():
             mand = "      MANDATORY"
         else:
@@ -368,15 +387,25 @@ def display_in_order(instruction):
         else:
             late = ""
             
-        text = "Delivery: " + delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i] + late + mand
+        text = str(i_day) + ") Delivery: " + assignm_delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i_subj] + late + mand
             
         print(text)
+
         i += 1
-        try:
-            if not (assignm.get_delivery_date() == assignments[i].get_delivery_date()):
-                print("")
-        except IndexError:
-            print("")
+        i_day += 1
+        i_subj += 1
+
+    (hours, minutes) = decimal_to_time(total_time)
+    print("Hours: " + str(hours))
+    print("Minutes: " + str(minutes))
+
+        # try:
+        #     if not (assignm.get_delivery_date() == assignments[i].get_delivery_date()):
+        #         print("Hours: ")
+        #         print("")
+        #         i_day = 1
+        # except IndexError:
+        #     print("")
 
 def display_mand(instruction):
     (assignments, subject_name) = ordered_list()
