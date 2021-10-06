@@ -159,7 +159,7 @@ def assignments_ordered():
     for subj in school.get_subj_list():
         for assignm in subj.get_assignm_list():
             assignments.append(assignm)
-            list_name.append("School")
+            list_name.append(subj.get_name())
             category_index.append(school.get_subj_list().index(subj))
             assignm_index.append(subj.get_assignm_list().index(assignm))
 
@@ -354,18 +354,33 @@ def display_in_order(instruction):
     i = 0
     i_subj = 0
     i_day = 1
-    day = str(assignments[0].get_delivery_date())
+    day = assignments[0].get_delivery_date()
     total_time = 0
 
     for assignm in assignments:
         (hours, minutes) = decimal_to_time(assignm.get_time_to_finish())
-        assignm_delivery = str(assignm.get_delivery_date())
+        assignm_delivery = assignm.get_delivery_date()
 
-        if assignm_delivery == day:
+        if str(assignm_delivery) == str(day):
             # Sumar horas
             total_time += assignm.get_time_to_finish()
         else:
             (hours_day, minutes_day) = decimal_to_time(total_time)
+            weekday = day.weekday()
+            if weekday == 0:
+                print("Monday")
+            elif weekday == 1:
+                print("Tuesday")
+            elif weekday == 2:
+                print("Wednesday")
+            elif weekday == 3:
+                print("Thursday")
+            elif weekday == 4:
+                print("Friday")
+            elif weekday == 5:
+                print("Saturday")
+            elif weekday == 6:
+                print("Sunday")
             print("Hours: " + str(hours_day))
             print("Minutes: " + str(minutes_day))
             print("")
@@ -387,7 +402,7 @@ def display_in_order(instruction):
         else:
             late = ""
             
-        text = str(i_day) + ") Delivery: " + assignm_delivery + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i_subj] + late + mand
+        text = str(i_day) + ") Delivery: " + str(assignm_delivery) + " " + assignm.get_name() + " | " + "Remaining time: " + str(hours) + " hours " + str(minutes) + " minutes - " + subject_name[i_subj] + late + mand
             
         print(text)
 
@@ -396,6 +411,21 @@ def display_in_order(instruction):
         i_subj += 1
 
     (hours, minutes) = decimal_to_time(total_time)
+    weekday = day.weekday()
+    if weekday == 0:
+        print("Monday")
+    elif weekday == 1:
+        print("Tuesday")
+    elif weekday == 2:
+        print("Wednesday")
+    elif weekday == 3:
+        print("Thursday")
+    elif weekday == 4:
+        print("Friday")
+    elif weekday == 5:
+        print("Saturday")
+    elif weekday == 6:
+        print("Sunday")
     print("Hours: " + str(hours))
     print("Minutes: " + str(minutes))
 
@@ -1019,15 +1049,12 @@ def push_day(instruction):
         push_index = int(input("push: "))
 
         while(push_index != len(day_assignments)):
-            if day_assignments_list_name[push_index] == "School":
-                push_school([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
-            elif day_assignments_list_name[push_index] == "Natma":
+            if day_assignments_list_name[push_index] == "Natma":
                 push_natma([day_assignm_index[push_index] + 1])
             elif day_assignments_list_name[push_index] == "Personal":
                 push_personal([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
             else:
-                print("Unknown list")
-                break
+                push_school([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
 
             (assignments, list_name, category_index, assignm_index) = assignments_ordered()
 
@@ -1097,15 +1124,12 @@ def push_all_day(instruction):
 
         for assignm in day_assignments:
             push_index = day_assignments.index(assignm)
-            if day_assignments_list_name[push_index] == "School":
-                push_school([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
-            elif day_assignments_list_name[push_index] == "Natma":
+            if day_assignments_list_name[push_index] == "Natma":
                 push_natma([day_assignm_index[push_index] + 1])
             elif day_assignments_list_name[push_index] == "Personal":
                 push_personal([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
             else:
-                print("Unknown list")
-                break
+                push_school([day_category_index[push_index] + 1, day_assignm_index[push_index] + 1])
             
     except (IndexError):
         print("Please enter the full instruction")
