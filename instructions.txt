@@ -1,3 +1,6 @@
+#################
+Assignments
+#################
 
 disp = display each subject with its corresponding assignment
 disp inor = display all assignments in order of delivery date
@@ -71,6 +74,17 @@ push d <month> <day> <year> = select which assignments to push from a specific d
 push a <month> <day> = push all assigments from a specific date
 push a <month> <day> <year> = push all assigments from a specific date
 
+
+
+#################
+Budget for semester
+#################
+
+disp bud = Display all aspects about budget
+
+add bud t = Add total budget
+add bud r = Add real budget
+add bud e = Add expected budget
 
 
 q = exit program
