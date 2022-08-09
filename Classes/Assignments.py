@@ -171,15 +171,16 @@ class PersAssignment(Assignment):
 
 
 class PersAssignmentPeriodic(Assignment):
-    def __init__(self, name, periodic_type, start_time, perc_in_1hr=100, perc_completed=0, mandatory=False):
+    def __init__(self, name, delivery_date, periodic_type, start_time, perc_in_1hr=100, perc_completed=0, mandatory=False, weekly_periodic_day_int=0):
         self.name = name
+        self.delivery_date = delivery_date
         self.periodic_type = periodic_type
         self.perc_in_1hr = perc_in_1hr
         self.perc_completed = perc_completed
         self.mandatory = mandatory
-        self.delivery_date = dt.date.today()
-        self.set_delivery_dates()
+        self.delivery_date = delivery_date
         self.start_time = start_time  # Array
+        self.weekly_periodic_day_int = weekly_periodic_day_int
 
     def set_delivery_dates(self):
         if self.periodic_type == 0:  # Every day
@@ -263,6 +264,12 @@ class PersAssignmentPeriodic(Assignment):
     def set_start_time(self, start_time):
         self.start_time = start_time
 
+    def set_weekly_periodic_day_int(self, weekly_periodic_day_int):
+        self.weekly_periodic_day_int = weekly_periodic_day_int
+
+    def set_weekly_start_times(self, weekly_start_times):
+        self.weekly_start_times = weekly_start_times
+
     def update_delivery_date(self):
         self.set_delivery_dates()
 
@@ -301,15 +308,31 @@ class PersAssignmentPeriodic(Assignment):
         except ZeroDivisionError:
             return 0
 
+    def get_weekly_periodic_day_int(self):
+        return self.weekly_periodic_day_int
+
+    def get_weekly_start_times(self):
+        return self.weekly_start_times
+
+    def get_weekly_start_time_hours_int(self):
+        self.weekly_start_times_hours_int = []
+        for i in range(7):
+            self.weekly_start_times_hours_int.append(
+                int(self.weekly_start_times[i].strftime("%H")))
+        return self.weekly_start_times_hours_int
+
+    def get_weekly_start_time_minutes_int(self):
+        self.weekly_start_times_minutes_int = []
+        for i in range(7):
+            self.weekly_start_times_minutes_int.append(
+                int(self.weekly_start_times[i].strftime("%M")))
+        return self.weekly_start_times_minutes_int
+
+
 # periodic type = 0: Every day
-# periodic type = 1: Every monday
-# periodic type = 2: Every tuesday
-# periodic type = 3: Every wednesday
-# periodic type = 4: Every thursday
-# periodic type = 5: Every friday
-# periodic type = 6: Every satruday
-# periodic type = 7: Every sunday
-# periodic type = 8: Every specific day of a month
+# periodic type = 1: Every week
+# periodic type = 2: Every month
+# periodic type = 3: Every year
 # #
 
 

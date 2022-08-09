@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt, QDateTime
 from datetime import *
 
+import math
 import pickle as pk
 import pandas as pd
 
@@ -68,29 +69,36 @@ def update_assignments():
             if date1 < date2:
                 subject_index = personal.get_categ_list().index(subject)
                 assignment_index = subject.get_assignm_list().index(assignment)
-                personal.get_categ_list()[subject_index].get_assignm_list()[
-                    assignment_index].set_delivery_date(datetime.today())
+                # personal.get_categ_list()[subject_index].get_assignm_list()[
+                #     assignment_index].set_delivery_date(datetime.today())
                 # Rotate list values in periodic assignments
                 if isinstance(assignment, PersAssignmentPeriodic):
                     if assignment.get_periodic_type() == 0:
-                        # Start times
-                        start_times = personal.get_categ_list()[subject_index].get_assignm_list()[
-                            assignment_index].get_start_time()
-                        start_times.append(start_times.pop(0))
-                        personal.get_categ_list()[subject_index].get_assignm_list()[
-                            assignment_index].set_start_time(start_times)
-                        # p1hr
-                        p1hrList = personal.get_categ_list()[subject_index].get_assignm_list()[
-                            assignment_index].get_perc_in1hr()
-                        p1hrList.append(p1hrList.pop(0))
-                        personal.get_categ_list()[subject_index].get_assignm_list()[
-                            assignment_index].set_perc_in1hr(p1hrList)
-                        # pcomp
-                        pcompList = personal.get_categ_list()[subject_index].get_assignm_list()[
-                            assignment_index].get_perc_completed()
-                        pcompList.append(pcompList.pop(0))
-                        personal.get_categ_list()[subject_index].get_assignm_list()[
-                            assignment_index].set_perc_completed(pcompList)
+                        days_difference = date2 - date1
+                        for i in range(days_difference.days):
+                            # Delivery date
+                            personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].set_delivery_date(assignment.get_delivery_date() + timedelta(days=1))
+                            # Start times
+                            start_times = personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].get_start_time()
+                            lastDay = assignment.get_delivery_date() + timedelta(days=len(start_times))
+                            start_times.pop(0)
+                            start_times.append(lastDay.weekday())
+                            personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].set_start_time(start_times)
+                            # p1hr
+                            p1hrList = personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].get_perc_in1hr()
+                            p1hrList.append(p1hrList.pop(0))
+                            personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].set_perc_in1hr(p1hrList)
+                            # pcomp
+                            pcompList = personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].get_perc_completed()
+                            pcompList.append(pcompList.pop(0))
+                            personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].set_perc_completed(pcompList)
                 save_in_personal_file()
 
 
@@ -188,9 +196,12 @@ class Ui_MainWindow(QMainWindow):
             # Add assignments
             for assignment in assignments:
                 if isinstance(assignment, PersAssignmentPeriodic):
-                    if assignment.get_periodic_type() == 0:
+                    if assignment.get_periodic_type() == 0:  # Daily
+                        # try:
                         hour_index = (int(assignment.get_start_time()[
-                                      i].hour)*2) + round(int(assignment.get_start_time()[i].minute) / 30) + 1
+                            i].hour)*2) + round(int(assignment.get_start_time()[i].minute) / 30) + 1
+                        # except AttributeError:
+                        #     print(assignment.get_start_time()[i])
                         time_blocks = round(
                             assignment.get_time_to_finish(i) / 0.5)
                         next_day = 0
@@ -214,34 +225,77 @@ class Ui_MainWindow(QMainWindow):
                                 label_assignment, hour_index+j, i+2 + next_day)
                             label_assignment.setStyleSheet(
                                 "background-color: {0}".format(color))
-                elif assignment.get_delivery_date().strftime("%d/%m/%y") == day.strftime("%d/%m/%y"):
-                    hour_index = assignment.get_start_time_hours_int(
-                    ) * 2 + round(assignment.get_start_time_minutes_int() / 30) + 1
-                    time_blocks = round(assignment.get_time_to_finish() / 0.5)
-                    next_day = 0
-                    for j in range(time_blocks):
-                        label_assignment = QLabel(assignment.get_name())
-                        if hour_index + j > 48:
-                            hour_index = 1 - j
-                            if i < self.daysToShow - 1:
-                                next_day = 1
+                    elif assignment.get_periodic_type() == 1:  # Weekly
+                        date1 = assignment.get_delivery_date()
+                        date2 = day
+                        if isinstance(date1, date):
+                            date1 = datetime.combine(
+                                date1, datetime.min.time())
+                        if isinstance(date2, date):
+                            date2 = datetime.combine(
+                                date2, datetime.min.time())
+                        if assignment.get_weekly_periodic_day_int() == weekday and date1 <= date2:
+                            dayDifference = date2 - date1
+                            periodicIndex = math.floor(
+                                dayDifference.days / 7)
+                            if periodicIndex < 4:
+                                hour_index = (int(assignment.get_start_time()[
+                                    periodicIndex].hour)*2) + round(int(assignment.get_start_time()[periodicIndex].minute) / 30) + 1
+                                time_blocks = round(
+                                    assignment.get_time_to_finish(periodicIndex) / 0.5)
+                                next_day = 0
+                                for j in range(time_blocks):
+                                    label_assignment = QLabel(
+                                        assignment.get_name())
+                                    if hour_index + j > 48:
+                                        hour_index = 1 - j
+                                        if i < self.daysToShow - 1:
+                                            next_day = 1
+                                        else:
+                                            break
+                                    if self.used_matrix[hour_index + j - 1][i + next_day]:
+                                        color = "red"
+                                        self.simultaneous_matrix[hour_index +
+                                                                 j - 1][i + next_day] = True
+                                    else:
+                                        color = "lightblue"
+                                        self.used_matrix[hour_index +
+                                                         j - 1][i + next_day] = True
+                                    self.gridbox.addWidget(
+                                        label_assignment, hour_index+j, i+2 + next_day)
+                                    label_assignment.setStyleSheet(
+                                        "background-color: {0}".format(color))
+
+                else:
+                    if assignment.get_delivery_date().strftime("%d/%m/%y") == day.strftime("%d/%m/%y"):
+                        hour_index = assignment.get_start_time_hours_int(
+                        ) * 2 + round(assignment.get_start_time_minutes_int() / 30) + 1
+                        time_blocks = round(
+                            assignment.get_time_to_finish() / 0.5)
+                        next_day = 0
+                        for j in range(time_blocks):
+                            label_assignment = QLabel(assignment.get_name())
+                            if hour_index + j > 48:
+                                hour_index = 1 - j
+                                if i < self.daysToShow - 1:
+                                    next_day = 1
+                                else:
+                                    break
+                            if self.used_matrix[hour_index + j - 1][i + next_day]:
+                                color = "red"
+                                self.simultaneous_matrix[hour_index +
+                                                         j - 1][i + next_day] = True
                             else:
-                                break
-                        if self.used_matrix[hour_index + j - 1][i + next_day]:
-                            color = "red"
-                            self.simultaneous_matrix[hour_index +
-                                                     j - 1][i + next_day] = True
-                        else:
-                            self.used_matrix[hour_index +
-                                             j - 1][i + next_day] = True
-                            if subject_name[assignments.index(assignment)] == "Personal":
-                                color = "lightblue"
-                            else:
-                                color = "lightgrey"
-                        self.gridbox.addWidget(
-                            label_assignment, hour_index+j, i+2 + next_day)
-                        label_assignment.setStyleSheet(
-                            "background-color: {0}".format(color))
+                                self.used_matrix[hour_index +
+                                                 j - 1][i + next_day] = True
+                                if subject_name[assignments.index(assignment)] == "Personal":
+                                    color = "lightblue"
+                                else:
+                                    color = "lightgrey"
+                            self.gridbox.addWidget(
+                                label_assignment, hour_index+j, i+2 + next_day)
+                            label_assignment.setStyleSheet(
+                                "background-color: {0}".format(color))
 
         # Add hours to grid
         for i in range(48):
@@ -252,25 +306,33 @@ class Ui_MainWindow(QMainWindow):
             self.gridbox.addWidget(label, i+1, 1)
 
         # Add Buttons
-        add_button = QPushButton("Add activity")
-        self.gridbox.addWidget(add_button, 0, 0)
-        add_button.clicked.connect(self.gotoAddScreen)
+        addActivityButton = QPushButton("Add activity")
+        self.gridbox.addWidget(addActivityButton, 0, 0)
+        addActivityButton.clicked.connect(self.gotoAddActivityScreen)
+
+        addSubjectButton = QPushButton("Add subject")
+        self.gridbox.addWidget(addSubjectButton, 1, 0)
+        addSubjectButton.clicked.connect(self.gotoAddSubjectScreen)
 
         edit_button = QPushButton("Edit activity")
-        self.gridbox.addWidget(edit_button, 1, 0)
+        self.gridbox.addWidget(edit_button, 2, 0)
         edit_button.clicked.connect(self.gotoEditScreen)
 
         simultaneous_button = QPushButton("Edit simultaneous activities")
-        self.gridbox.addWidget(simultaneous_button, 2, 0)
+        self.gridbox.addWidget(simultaneous_button, 3, 0)
         simultaneous_button.clicked.connect(self.gotoSimultaneousScreen)
 
         pushActivityButton = QPushButton("Push activity")
-        self.gridbox.addWidget(pushActivityButton, 3, 0)
+        self.gridbox.addWidget(pushActivityButton, 4, 0)
         pushActivityButton.clicked.connect(self.gotoPushActivityScreen)
 
         pushSubjectButton = QPushButton("Push subject")
-        self.gridbox.addWidget(pushSubjectButton, 4, 0)
+        self.gridbox.addWidget(pushSubjectButton, 5, 0)
         pushSubjectButton.clicked.connect(self.gotoPushSubjectScreen)
+
+        pushSubjectButton = QPushButton("Push day")
+        self.gridbox.addWidget(pushSubjectButton, 6, 0)
+        pushSubjectButton.clicked.connect(self.gotoPushDayScreen)
 
         # Scroll Area Properties
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -284,9 +346,14 @@ class Ui_MainWindow(QMainWindow):
         self.setWindowTitle('Organizer')
         self.show()
 
-    def gotoAddScreen(self):
-        addScreen = Ui_AddScreen()
-        widget.addWidget(addScreen)
+    def gotoAddActivityScreen(self):
+        addActivityScreen = Ui_AddActivityScreen()
+        widget.addWidget(addActivityScreen)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def gotoAddSubjectScreen(self):
+        addSubjectScreen = Ui_AddSubjectScreen()
+        widget.addWidget(addSubjectScreen)
         widget.setCurrentIndex(widget.count() - 1)
 
     def gotoEditScreen(self):
@@ -309,8 +376,13 @@ class Ui_MainWindow(QMainWindow):
         widget.addWidget(pushSubjectScreen)
         widget.setCurrentIndex(widget.count() - 1)
 
+    def gotoPushDayScreen(self):
+        pushDayScreen = Ui_PushDayScreen()
+        widget.addWidget(pushDayScreen)
+        widget.setCurrentIndex(widget.count() - 1)
 
-class Ui_AddScreen(QMainWindow):
+
+class Ui_AddActivityScreen(QMainWindow):
     def __init__(self):
         super().__init__()
 
@@ -358,6 +430,8 @@ class Ui_AddScreen(QMainWindow):
         self.periodicComboBox = QComboBox()  # Category list
         self.periodicComboBox.addItems(
             ["Daily", "Weekly", "Monthly", "Yearly"])
+        self.periodicComboBox.currentTextChanged.connect(
+            self.onPeriodicComboboxChanged)
         self.form.addRow(QLabel("Periodic"), self.periodicComboBox)
 
         self.formGroupBox = QGroupBox("Adding activity")
@@ -403,26 +477,79 @@ class Ui_AddScreen(QMainWindow):
         elif periodic == "Weekly":
             periodic_number = 1
         elif periodic == "Monthly":
-            periodic_number = 8
+            periodic_number = 2
         elif periodic == "Yearly":
-            periodic_number = 10
+            periodic_number = 3
 
         if category == "School":
-            new_assignment = Homework(
-                0, assignment_name, delivery_date, start_time, perc_in_1hr=p1hr)
-            school.get_subj_list()[subject_index].add_assignm(
-                new_assignment)
+            if self.new_assignment_periodic:
+                if periodic_number == 1:  # Weekly
+                    start_time_list = []
+                    p1hrList = []
+                    pcompList = []
+                    for i in range(4):
+                        start_time_list.append(start_time)
+                        p1hrList.append(p1hr)
+                        pcompList.append(0)
+                    if self.weeklyComboBox.currentText() == "Monday":
+                        weeklyPeriodicDayInt = 0
+                    elif self.weeklyComboBox.currentText() == "Tuesday":
+                        weeklyPeriodicDayInt = 1
+                    elif self.weeklyComboBox.currentText() == "Wednesday":
+                        weeklyPeriodicDayInt = 2
+                    elif self.weeklyComboBox.currentText() == "Thursday":
+                        weeklyPeriodicDayInt = 3
+                    elif self.weeklyComboBox.currentText() == "Friday":
+                        weeklyPeriodicDayInt = 4
+                    elif self.weeklyComboBox.currentText() == "Saturday":
+                        weeklyPeriodicDayInt = 5
+                    elif self.weeklyComboBox.currentText() == "Sunday":
+                        weeklyPeriodicDayInt = 6
+                    new_assignment = PersAssignmentPeriodic(
+                        assignment_name, delivery_date, periodic_number, start_time_list, perc_in_1hr=p1hrList, perc_completed=pcompList, weekly_periodic_day_int=weeklyPeriodicDayInt)
+                    school.get_subj_list()[subject_index].add_assignm(
+                        new_assignment)
+            else:
+                new_assignment = Homework(
+                    0, assignment_name, delivery_date, start_time, perc_in_1hr=p1hr)
+                school.get_subj_list()[subject_index].add_assignm(
+                    new_assignment)
             save_in_school_file()
         elif category == "Personal" and self.new_assignment_periodic:
-            start_time_list = []
-            p1hrList = []
-            for i in range(30):
-                start_time_list.append(start_time)
-                p1hrList.append(p1hr)
-            new_assignment = PersAssignmentPeriodic(
-                assignment_name, periodic_number, start_time_list, perc_in_1hr=p1hr)
-            personal.get_categ_list()[subject_index_personal_list].add_assignm(
-                new_assignment)
+            if periodic_number == 0:  # Daily
+                start_time_list = []
+                p1hrList = []
+                for i in range(30):
+                    start_time_list.append(start_time)
+                    p1hrList.append(p1hr)
+                new_assignment = PersAssignmentPeriodic(
+                    assignment_name, delivery_date, periodic_number, start_time_list, perc_in_1hr=p1hrList)
+                personal.get_categ_list()[subject_index_personal_list].add_assignm(
+                    new_assignment)
+            elif periodic_number == 1:  # Weekly
+                start_time_list = []
+                p1hrList = []
+                for i in range(4):
+                    start_time_list.append(start_time)
+                    p1hrList.append(p1hr)
+                if self.weeklyComboBox.currentText() == "Monday":
+                    weeklyPeriodicDayInt = 0
+                elif self.weeklyComboBox.currentText() == "Tuesday":
+                    weeklyPeriodicDayInt = 1
+                elif self.weeklyComboBox.currentText() == "Wednesday":
+                    weeklyPeriodicDayInt = 2
+                elif self.weeklyComboBox.currentText() == "Thursday":
+                    weeklyPeriodicDayInt = 3
+                elif self.weeklyComboBox.currentText() == "Friday":
+                    weeklyPeriodicDayInt = 4
+                elif self.weeklyComboBox.currentText() == "Saturday":
+                    weeklyPeriodicDayInt = 5
+                elif self.weeklyComboBox.currentText() == "Sunday":
+                    weeklyPeriodicDayInt = 6
+                new_assignment = PersAssignmentPeriodic(
+                    assignment_name, delivery_date, periodic_number, start_time_list, perc_in_1hr=p1hrList, perc_completed=pcompList, weekly_periodic_day_int=weeklyPeriodicDayInt)
+                personal.get_categ_list()[subject_index_personal_list].add_assignm(
+                    new_assignment)
             save_in_personal_file()
         else:
             start_time = time(hour=start_time_hours, minute=start_time_minutes)
@@ -438,6 +565,82 @@ class Ui_AddScreen(QMainWindow):
 
     def periodicCheckBoxClick(self, state):
         self.new_assignment_periodic = state == Qt.Checked
+
+    def onPeriodicComboboxChanged(self, value):
+        # self.periodicComboBox = QComboBox()  # Category list
+        # self.periodicComboBox.addItems(
+        #     ["Daily", "Weekly", "Monthly", "Yearly"])
+        # self.periodicComboBox.currentTextChanged.connect(
+        #     self.onPeriodicComboboxChanged)
+        # self.form.addRow(QLabel("Periodic"), self.periodicComboBox)
+
+        if value == "Weekly":
+            self.weeklyComboBox = QComboBox()
+            self.weeklyComboBox.addItems(
+                ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+            self.form.addRow(QLabel("Day to repeat"), self.weeklyComboBox)
+        else:
+            # try:
+            self.form.removeRow(self.weeklyComboBox)
+
+
+class Ui_AddSubjectScreen(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.widget = QWidget()
+
+        # Form
+        self.form = QFormLayout()
+
+        # creating the form
+        self.subjectNameLineEdit = QLineEdit()  # Subject name
+        self.form.addRow(QLabel("Subject name"), self.subjectNameLineEdit)
+
+        self.categoryComboBox = QComboBox()  # Category list
+        self.categoryComboBox.addItems(["School", "Personal"])
+        self.form.addRow(QLabel("Category"), self.categoryComboBox)
+
+        self.formGroupBox = QGroupBox("Adding subject")
+        self.formGroupBox.setLayout(self.form)
+
+        self.buttonBox = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.buttonBox.accepted.connect(self.getInfo)
+        self.buttonBox.rejected.connect(self.gotoMainScreen)
+
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(self.formGroupBox)
+        mainLayout.addWidget(self.buttonBox)
+
+        self.widget.setLayout(mainLayout)
+
+        self.setCentralWidget(self.widget)
+
+        self.setGeometry(600, 100, 1000, 900)
+        self.setWindowTitle('Organizer')
+
+    def gotoMainScreen(self):
+        mainWindow = Ui_MainWindow()
+        widget.addWidget(mainWindow)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def getInfo(self):
+        subjectName = self.subjectNameLineEdit.text()
+        category = self.categoryComboBox.currentText()
+
+        if category == "School":
+            newSubject = Subject(subjectName)
+            school.add_subj(newSubject)
+            save_in_school_file()
+        elif category == "Personal":
+            newSubject = Category(subjectName)
+            personal.add_categ(newSubject)
+            save_in_personal_file()
+
+        mainWindow = Ui_MainWindow()
+        widget.addWidget(mainWindow)
+        widget.setCurrentIndex(widget.currentIndex() + 1)
 
 
 class Ui_EditScreen(QMainWindow):
@@ -494,11 +697,11 @@ class Ui_EditScreen(QMainWindow):
         self.editAssignmentPushButton = QPushButton("Edit")
         self.editAssignmentPushButton.clicked.connect(
             self.gotoEditAssignmentScreen)
-        self.gridbox.addWidget(self.editAssignmentPushButton, i, 0)
+        self.gridbox.addWidget(self.editAssignmentPushButton, 0, 2)
 
         self.cancelPushButton = QPushButton("Cancel")
         self.cancelPushButton.clicked.connect(self.gotoMainScreen)
-        self.gridbox.addWidget(self.cancelPushButton, i, 1)
+        self.gridbox.addWidget(self.cancelPushButton, 1, 2)
 
         # Scroll Area Properties
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -611,6 +814,48 @@ class Ui_EditAssignmentScreen(QMainWindow):
                     self.p1hrLineEdit)
                 self.form.addRow(self.periodicListsHBoxLayout)
 
+            # Start times
+            self.weeklyStartTimeHoursSpinBoxes = []
+            self.weeklyStartTimeMinutesSpinBoxes = []
+
+            for i in range(7):
+                self.periodicListsHBoxLayout2 = QHBoxLayout()
+                if i == 0:
+                    weekday = "Monday"
+                elif i == 1:
+                    weekday = "Tuesday"
+                elif i == 2:
+                    weekday = "Wednesday"
+                elif i == 3:
+                    weekday = "Thursday"
+                elif i == 4:
+                    weekday = "Friday"
+                elif i == 5:
+                    weekday = "Saturday"
+                elif i == 6:
+                    weekday = "Sunday"
+                self.weeklyStartTimeLabel = QLabel(
+                    "{0}".format(weekday))
+                self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
+                self.weeklyStartTimeHoursSpinBox.setValue(
+                    self.assignmentToEdit.get_weekly_start_time_hours_int()[i])
+                self.weeklyStartTimeHoursSpinBoxes.append(
+                    self.startTimeHoursSpinBox)
+                self.weeklyStartTimeMinutesSpinBox = QSpinBox()  # Start time minutes
+                self.weeklyStartTimeMinutesSpinBox.setValue(
+                    self.assignmentToEdit.get_start_time_minutes_int()[i])
+                self.weeklyStartTimeMinutesSpinBoxes.append(
+                    self.weeklyStartTimeMinutesSpinBox)
+
+                self.periodicListsHBoxLayout2.addWidget(
+                    self.weeklyStartTimeLabel)
+                self.periodicListsHBoxLayout2.addWidget(
+                    self.weeklyStartTimeHoursSpinBox)
+                self.periodicListsHBoxLayout2.addWidget(QLabel(":"))
+                self.periodicListsHBoxLayout2.addWidget(
+                    self.weeklyStartTimeMinutesSpinBox)
+                self.form.addRow(self.periodicListsHBoxLayout2)
+
             self.startTimeAllHBoxLayout = QHBoxLayout()
             self.startTimeAllLabel = QLabel("Set start time for all days")
             self.startTimeAllHoursSpinBox = QSpinBox()  # Start time hour
@@ -703,7 +948,8 @@ class Ui_EditAssignmentScreen(QMainWindow):
             p1hr = float(self.p1hrLineEdit.text())
             start_time_hours = int(self.startTimeHoursSpinBox.text())
             start_time_minutes = int(self.startTimeMinutesSpinBox.text())
-            startTime = time(hour=start_time_hours, minute=start_time_minutes)
+            startTime = time(hour=start_time_hours,
+                             minute=start_time_minutes)
             school.get_subj_list()[self.subjectIndex].get_assignm_list()[
                 self.assignmentIndex].set_name(assignment_name)
             school.get_subj_list()[self.subjectIndex].get_assignm_list()[
@@ -1228,6 +1474,122 @@ class Ui_PushSubjectScreen(QMainWindow):
         btn = self.sender()
         if btn.isChecked():
             self.subjectSelected = btn.text()
+
+
+class Ui_PushDayScreen(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.scroll = QScrollArea()
+        self.widget = QWidget()
+        self.gridbox = QGridLayout()
+
+        self.widget.setLayout(self.gridbox)
+
+        myFont = QFont()
+        myFont.setBold(True)
+
+        days = [(datetime.today() + timedelta(days=x))
+                for x in range(daysToShow)]
+
+        (self.assignments, self.subject_name) = self.getDeliveryOrderedAssignments()
+
+        i = 0
+        j = 0
+        for day in days:
+            self.dayRadioButton = QRadioButton(
+                day.strftime("%d/%m/%Y"))
+            self.dayRadioButton.setFont(myFont)
+            self.dayRadioButton.toggled.connect(
+                self.selectDay)
+            self.gridbox.addWidget(
+                self.dayRadioButton, i, 0)
+            i += 1
+            print("Assignment: " +
+                  self.assignments[j].get_delivery_date().strftime("%d/%m/%Y"))
+            print("Day: " + day.strftime("%d/%m/%Y"))
+            while self.assignments[j].get_delivery_date().strftime("%d/%m/%Y") == day.strftime("%d/%m/%Y"):
+                self.assignmentLabel = QLabel(self.assignments[j].get_name())
+                self.gridbox.addWidget(self.assignmentLabel, i, 0)
+                j += 1
+                i += 1
+
+        # Buttons
+        self.pushDayPushButton = QPushButton("Push day")
+        self.pushDayPushButton.clicked.connect(
+            self.pushDay)
+        self.gridbox.addWidget(self.pushDayPushButton, 0, 1)
+
+        self.cancelPushButton = QPushButton("Cancel")
+        self.cancelPushButton.clicked.connect(self.gotoMainScreen)
+        self.gridbox.addWidget(self.cancelPushButton, 1, 1)
+
+        # Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
+
+        self.setCentralWidget(self.scroll)
+
+    def getDeliveryOrderedAssignments(self):
+        assignments = []
+        subject_name = []
+        # delivery_dates = []
+        for subj in school.get_subj_list():
+            for assignm in subj.get_assignm_list():
+                assignments.append(assignm)
+                subject_name.append(subj.get_name())
+                # delivery_dates.append(assignm.get_delivery_date())
+
+        for categ in personal.get_categ_list():
+            for assignm in categ.get_assignm_list():
+                assignments.append(assignm)
+                subject_name.append(categ.get_name())
+                # delivery_dates.append(assignm.get_delivery_date())
+
+        for i in range(1, len(assignments)):
+            j = i
+            while j < len(assignments):
+                date1 = assignments[i-1].get_delivery_date()
+                date2 = assignments[j].get_delivery_date()
+                if isinstance(date1, date):
+                    date1 = datetime.combine(
+                        date1, datetime.min.time())
+                if isinstance(date2, date):
+                    date2 = datetime.combine(
+                        date2, datetime.min.time())
+                if date1 > date2:
+                    (assignments[i-1], assignments[j]
+                     ) = (assignments[j], assignments[i-1])
+                    (subject_name[i-1], subject_name[j]
+                     ) = (subject_name[j], subject_name[i-1])
+                    j = i
+                else:
+                    j += 1
+        return (assignments, subject_name)
+
+    def gotoMainScreen(self):
+        mainWindow = Ui_MainWindow()
+        widget.addWidget(mainWindow)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def pushDay(self):
+        subjects = school.get_subj_list() + personal.get_categ_list()
+        for subject in subjects:
+            for assignment in subject.get_assignm_list():
+                if not isinstance(assignment, PersAssignmentPeriodic):
+                    if assignment.get_delivery_date().strftime("%d/%m/%Y") == self.daySelected:
+                        assignment.set_delivery_date(
+                            assignment.get_delivery_date() + timedelta(days=1))
+        save_in_personal_file()
+        save_in_school_file()
+        self.gotoMainScreen()
+
+    def selectDay(self):
+        btn = self.sender()
+        if btn.isChecked():
+            self.daySelected = btn.text()
 
 
 update_assignments()  # Update assignment dates

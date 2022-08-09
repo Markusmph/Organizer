@@ -1488,23 +1488,24 @@ today = dt.datetime.today()
 # for category in personal.get_categ_list():
 #     for assignment in category.get_assignm_list():
 #         if isinstance(assignment, PersAssignmentPeriodic):
-#             assignment.set_delivery_date(dt.date(year=2022, month=8, day=1))
-#             # p1hrList = []
-#             # pcompList = []
-#             # for i in range(30):
-#             #     if assignment.get_perc_in1hr()[0] == [0]:
-#             #         p1hrList.append(100)
-#             #         print(assignment.get_name())
-#             #     else:
-#             #         p1hrList.append(assignment.get_perc_in1hr()[0])
-#             #     pcompList.append(assignment.get_perc_completed()[0])
-#             # assignment.set_perc_in1hr(p1hrList)
-#             # assignment.set_perc_completed(pcompList)
-#             # print("p1hr: " + str(assignment.get_perc_in1hr()))
-#             # print("pcomp: " + str(assignment.get_perc_completed()))
+#             for i in range(len(assignment.get_start_time())):
+#                 if isinstance(assignment.get_start_time()[i], int):
+#                     start_times = assignment.get_start_time()
+#                     start_times[i] = dt.time(hour=0, minute=0)
+#                     assignment.set_start_time(start_times)
+#                     print("Changed")
+# for category in school.get_subj_list():
+#     for assignment in category.get_assignm_list():
+#         if isinstance(assignment, PersAssignmentPeriodic):
+#             for i in range(len(assignment.get_start_time())):
+#                 if isinstance(assignment.get_start_time()[i], int):
+#                     start_times = assignment.get_start_time()
+#                     start_times[i] = dt.time(hour=0, minute=0)
+#                     assignment.set_start_time(start_times)
+#                     print("Changed")
 
-#         save_in_personal_file()
-# # save_in_school_file()
+# save_in_personal_file()
+# save_in_school_file()
 
 
 while True:

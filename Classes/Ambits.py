@@ -75,6 +75,10 @@ class Subject:
 
     def add_assignm(self, new_assignm):
         self.assignm_list.append(new_assignm)
+        print("Ambits msg: Assignment added to " + self.name)
+
+    def set_assignm_list(self, assignm_list):
+        self.assignm_list = assignm_list
 
     def remove_assignm(self, index):
         pass
