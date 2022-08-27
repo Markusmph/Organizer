@@ -113,6 +113,7 @@ class Ui_MainWindow(QMainWindow):
         self.gridbox = QGridLayout()
 
         self.widget.setLayout(self.gridbox)
+        update_assignments()  # Update assignment dates
 
         # Order assignments in a single list
         assignments = []
@@ -198,8 +199,10 @@ class Ui_MainWindow(QMainWindow):
                 if isinstance(assignment, PersAssignmentPeriodic):
                     if assignment.get_periodic_type() == 0:  # Daily
                         # try:
-                        hour_index = (int(assignment.get_start_time()[
-                            i].hour)*2) + round(int(assignment.get_start_time()[i].minute) / 30) + 1
+                        hour_index = getTimeIndex(
+                            assignment.get_start_time()[i]) + 1
+                        # hour_index = (int(assignment.get_start_time()[
+                        #     i].hour)*2) + round(int(assignment.get_start_time()[i].minute) / 30) + 1
                         # except AttributeError:
                         #     print(assignment.get_start_time()[i])
                         time_blocks = round(
@@ -367,7 +370,7 @@ class Ui_MainWindow(QMainWindow):
         widget.setCurrentIndex(widget.count() - 1)
 
     def gotoPushActivityScreen(self):
-        pushActivityScreen = Ui_PushActivityScreen()
+        pushActivityScreen = Ui_PushActivityScreen(self.used_matrix)
         widget.addWidget(pushActivityScreen)
         widget.setCurrentIndex(widget.count() - 1)
 
@@ -529,9 +532,11 @@ class Ui_AddActivityScreen(QMainWindow):
             elif periodic_number == 1:  # Weekly
                 start_time_list = []
                 p1hrList = []
+                pcompList = []
                 for i in range(4):
                     start_time_list.append(start_time)
                     p1hrList.append(p1hr)
+                    pcompList.append(0)
                 if self.weeklyComboBox.currentText() == "Monday":
                     weeklyPeriodicDayInt = 0
                 elif self.weeklyComboBox.currentText() == "Tuesday":
@@ -783,7 +788,9 @@ class Ui_EditAssignmentScreen(QMainWindow):
             # P1hr list
             self.p1hrLineEdits = []
 
-            for i in range(5):
+            self.periodicDaysToShow = 10
+
+            for i in range(self.periodicDaysToShow):
                 delivery_date_string = (self.assignmentToEdit.get_delivery_date(
                 ) + timedelta(days=i)).strftime("%Y/%m/%d")
                 self.periodicListsHBoxLayout = QHBoxLayout()
@@ -966,7 +973,7 @@ class Ui_EditAssignmentScreen(QMainWindow):
                 start_time_minutes = []
                 start_time_new = []
                 p1hr_new = []
-                for i in range(5):
+                for i in range(self.periodicDaysToShow):
                     start_time_hours.append(
                         int(self.startTimeHoursSpinBoxes[i].text()))
                     start_time_minutes.append(
@@ -984,7 +991,7 @@ class Ui_EditAssignmentScreen(QMainWindow):
                     self.assignmentIndex].get_start_time()
                 p1hrList = personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
                     self.assignmentIndex].get_perc_in1hr()
-                for i in range(5):
+                for i in range(self.periodicDaysToShow):
                     start_times[i] = start_time_new[i]
                     p1hrList[i] = p1hr_new[i]
                 personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
@@ -1178,24 +1185,55 @@ class Ui_SimultaneousScreen(QMainWindow):
         # School assignments
         for category in school.get_subj_list():
             for assignment in category.get_assignm_list():
-                date1 = assignment.get_delivery_date()
-                date2 = date.today() + \
-                    timedelta(days=len(simultaneousMatrix[0]))
-                if isinstance(date1, date):
-                    date1 = datetime.combine(date1, datetime.min.time())
-                if isinstance(date2, date):
-                    date2 = datetime.combine(date2, datetime.min.time())
-                if date1 <= date2:  # Limit to 5 days
-                    hourIndex = assignment.get_start_time_hours_int(
-                    ) * 2 + round(assignment.get_start_time_minutes_int() / 30)
-                    dayIndex = assignment.get_delivery_date().day - datetime.today().day
-                    time_blocks = round(
-                        assignment.get_time_to_finish() / 0.5)
-                    for i in range(time_blocks):
-                        if simultaneousMatrix[hourIndex + i][dayIndex]:
-                            simultaneousSchoolAssignments.append(assignment)
-                            simultaneousSchoolCategory.append(category)
-                            break
+                added = False
+                if isinstance(assignment, PersAssignmentPeriodic):
+                    if assignment.get_periodic_type() == 0:  # Daily periodic assignments
+                        for i in range(len(simultaneousMatrix[0])):
+                            if not added:
+                                hourIndex = assignment.get_start_time_hours_int(
+                                )[i] * 2 + round(assignment.get_start_time_minutes_int()[i] / 30)
+                                dayIndex = i
+                                time_blocks = round(
+                                    assignment.get_time_to_finish(i) / 0.5)
+                                for timeBlock in range(time_blocks):
+                                    if hourIndex + timeBlock >= len(simultaneousMatrix):
+                                        hourIndex = -timeBlock
+                                        if dayIndex < len(simultaneousMatrix[0]):
+                                            dayIndex += 1
+                                        else:
+                                            break
+                                    if simultaneousMatrix[hourIndex + timeBlock][dayIndex]:
+                                        simultaneousPersonalAssignments.append(
+                                            assignment)
+                                        simultaneousPersonalCategory.append(
+                                            category)
+                                        added = True
+                                        break
+                            else:
+                                break
+                    elif assignment.get_periodic_type() == 1:  # Weekly periodic assignments
+                        pass
+                else:
+
+                    date1 = assignment.get_delivery_date()
+                    date2 = date.today() + \
+                        timedelta(days=len(simultaneousMatrix[0]))
+                    if isinstance(date1, date):
+                        date1 = datetime.combine(date1, datetime.min.time())
+                    if isinstance(date2, date):
+                        date2 = datetime.combine(date2, datetime.min.time())
+                    if date1 <= date2:  # Limit to 5 days
+                        hourIndex = assignment.get_start_time_hours_int(
+                        ) * 2 + round(assignment.get_start_time_minutes_int() / 30)
+                        dayIndex = assignment.get_delivery_date().day - datetime.today().day
+                        time_blocks = round(
+                            assignment.get_time_to_finish() / 0.5)
+                        for i in range(time_blocks):
+                            if simultaneousMatrix[hourIndex + i][dayIndex]:
+                                simultaneousSchoolAssignments.append(
+                                    assignment)
+                                simultaneousSchoolCategory.append(category)
+                                break
 
         # Personal assignments
         for category in personal.get_categ_list():
@@ -1256,7 +1294,7 @@ class Ui_SimultaneousScreen(QMainWindow):
 
 
 class Ui_PushActivityScreen(QMainWindow):
-    def __init__(self):
+    def __init__(self, used_matrix):
         super().__init__()
 
         self.scroll = QScrollArea()
@@ -1264,6 +1302,8 @@ class Ui_PushActivityScreen(QMainWindow):
         self.gridbox = QGridLayout()
 
         self.widget.setLayout(self.gridbox)
+
+        self.usedMatrix = used_matrix
 
         # Get the ordered assignments
         (self.assignments, self.subject_name) = self.getDeliveryOrderedAssignments()
@@ -1345,18 +1385,96 @@ class Ui_PushActivityScreen(QMainWindow):
         widget.setCurrentIndex(widget.count() - 1)
 
     def pushAssignment(self):
+        # 0 Get selected assignment
         for assignment in self.assignments:
-            if self.assignmentSelected == assignment.get_name():
-                assignment.set_delivery_date(
-                    assignment.get_delivery_date() + timedelta(days=1))
-        save_in_personal_file()
-        save_in_school_file()
-        self.gotoMainScreen()
+            if self.assignmentSelectedText == assignment.get_name():
+                self.assignmentSelected = assignment
+
+        # 1 Get index in the used matrix of the delivery of the assignment and the time blocks of the assignment
+        startHourIndex = getTimeIndex(self.assignmentSelected.get_start_time())
+        timeBlocks = round(self.assignmentSelected.get_time_to_finish() / 0.5)
+
+        date1 = self.assignmentSelected.get_delivery_date()
+        date2 = date.today()
+        if isinstance(date1, date):
+            date1 = datetime.combine(date1, datetime.min.time())
+        if isinstance(date2, date):
+            date2 = datetime.combine(date2, datetime.min.time())
+        dayDifference = date1 - date2
+
+        dayIndex = dayDifference.days
+
+        # 2 Loop through each cell counting the number of continuous free spots
+        freeSpotAvailable = False
+        currentBlockCount = 0
+        hourIndex = startHourIndex
+        while not freeSpotAvailable:
+            if hourIndex + timeBlocks < len(self.usedMatrix):
+                if not self.usedMatrix[hourIndex + timeBlocks][dayIndex]:
+                    currentBlockCount += 1
+                    # 3 If the number of free spots matches the amount of 30 minutes blocks of the time remaining for the assingment, set the delivery date to that
+                    if currentBlockCount == timeBlocks:  # Check if it is possible to put the assignment here
+                        newStartTime = getTimeFromTimeIndex(hourIndex + 1)
+                        newDeliveryDate = date.today() + timedelta(days=dayIndex)
+                        for assignment in self.assignments:
+                            if self.assignmentSelectedText == assignment.get_name():
+                                assignment.set_delivery_date(newDeliveryDate)
+                                assignment.set_start_time(newStartTime)
+                                freeSpotAvailable = True
+                                save_in_personal_file()
+                                save_in_school_file()
+
+                    else:  # Assignment does not fit yet
+                        if hourIndex + timeBlocks + 1 < len(self.usedMatrix):
+                            hourIndex += 1
+                        else:
+                            if dayIndex + 1 < len(self.usedMatrix[0]):
+                                hourIndex = -timeBlocks
+                                dayIndex += 1
+                            else:
+                                print(
+                                    "There is no space available inside the used matrix space")
+                                freeSpotAvailable = True
+
+                else:
+                    currentBlockCount = 0
+                    if hourIndex + timeBlocks + 1 < len(self.usedMatrix):
+                        hourIndex += 1
+                    else:
+                        if dayIndex + 1 < len(self.usedMatrix[0]):
+                            hourIndex = -timeBlocks
+                            dayIndex += 1
+                        else:
+                            print(
+                                "There is no space available inside the used matrix space")
+                            freeSpotAvailable = True
+
+            else:
+                if dayIndex + 1 < len(self.usedMatrix[0]):
+                    hourIndex = -timeBlocks
+                    dayIndex += 1
+                else:
+                    print("There is no space available inside the used matrix space")
+                    freeSpotAvailable = True
+
+            self.gotoMainScreen()
+
+            # 4 Save everything
+            # 5 Goto main screen
+
+            ####### OLD PUSH INSTRUCTION ########
+            # for assignment in self.assignments:
+            #     if self.assignmentSelected == assignment.get_name():
+            #         assignment.set_delivery_date(
+            #             assignment.get_delivery_date() + timedelta(days=1))
+            # save_in_personal_file()
+            # save_in_school_file()
+            # self.gotoMainScreen()
 
     def selectAssignment(self):
         btn = self.sender()
         if btn.isChecked():
-            self.assignmentSelected = btn.text()
+            self.assignmentSelectedText = btn.text()
 
     def getDeliveryOrderedAssignments(self):
         assignments = []
@@ -1592,7 +1710,16 @@ class Ui_PushDayScreen(QMainWindow):
             self.daySelected = btn.text()
 
 
-update_assignments()  # Update assignment dates
+def getTimeIndex(deliveryTime):
+    return int(deliveryTime.hour) * 2 + round(int(deliveryTime.minute) / 30)
+
+
+def getTimeFromTimeIndex(timeIndex):
+    hour = math.floor(timeIndex / 2)
+    minute = (timeIndex % 2) * 30
+    return time(hour=hour, minute=minute)
+
+
 app = QApplication(sys.argv)
 widget = QStackedWidget()
 

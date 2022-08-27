@@ -317,6 +317,7 @@ class PersAssignmentPeriodic(Assignment):
     def get_weekly_start_time_hours_int(self):
         self.weekly_start_times_hours_int = []
         for i in range(7):
+            print(self.weekly_start_times[i])
             self.weekly_start_times_hours_int.append(
                 int(self.weekly_start_times[i].strftime("%H")))
         return self.weekly_start_times_hours_int
