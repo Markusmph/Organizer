@@ -887,6 +887,133 @@ class Ui_EditAssignmentScreen(QMainWindow):
             # self.p1hrLineEdit.setText(
             #     str(self.assignmentToEdit.get_perc_in1hr()))
             # self.form.addRow(QLabel("Percentage in 1 hour"), self.p1hrLineEdit)
+        elif isinstance(self.assignmentToEdit, PersAssignmentPeriodic) and self.assignmentToEdit.get_periodic_type() == 1:
+            delivery_date_string = self.assignmentToEdit.get_delivery_date().strftime("%Y/%m/%d")
+            # creating the form
+            self.assignmentNameLineEdit = QLineEdit()  # Assignment name
+            self.assignmentNameLineEdit.setText(
+                self.assignmentToEdit.get_name())
+            self.form.addRow(QLabel("Activity name"),
+                             self.assignmentNameLineEdit)
+
+            self.deliveryDateEdit = QDateEdit(
+                calendarPopup=True)  # Delivery date
+            assignmentDate = QDateTime.fromString(
+                delivery_date_string, 'yyyy/MM/dd')
+            self.deliveryDateEdit.setDateTime(assignmentDate)
+            self.form.addRow(QLabel("Start date"), self.deliveryDateEdit)
+
+            # # Start times
+            # self.startTimeHoursSpinBoxes = []
+            # self.startTimeMinutesSpinBoxes = []
+            # # P1hr list
+            # self.p1hrLineEdits = []
+
+            # self.periodicDaysToShow = 4
+
+            # for i in range(self.periodicDaysToShow):
+            #     delivery_date_string = (self.assignmentToEdit.get_delivery_date(
+            #     ) + timedelta(days=i*7)).strftime("%Y/%m/%d")
+            #     self.periodicListsHBoxLayout = QHBoxLayout()
+            #     self.startTimeLabel = QLabel(
+            #         "Date: {0}".format(delivery_date_string))
+            #     self.startTimeHoursSpinBox = QSpinBox()  # Start time hour
+            #     self.startTimeHoursSpinBox.setValue(
+            #         self.assignmentToEdit.get_start_time_hours_int()[i])
+            #     self.startTimeHoursSpinBoxes.append(self.startTimeHoursSpinBox)
+            #     self.startTimeMinutesSpinBox = QSpinBox()  # Start time minutes
+            #     self.startTimeMinutesSpinBox.setValue(
+            #         self.assignmentToEdit.get_start_time_minutes_int()[i])
+            #     self.startTimeMinutesSpinBoxes.append(
+            #         self.startTimeMinutesSpinBox)
+            #     self.p1hrLineEdit = QLineEdit()  # p1hr
+            #     self.p1hrLineEdit.setText(
+            #         str(self.assignmentToEdit.get_perc_in1hr()[i]))
+            #     self.p1hrLineEdits.append(
+            #         self.p1hrLineEdit)
+
+            #     self.periodicListsHBoxLayout.addWidget(self.startTimeLabel)
+            #     self.periodicListsHBoxLayout.addWidget(
+            #         self.startTimeHoursSpinBox)
+            #     self.periodicListsHBoxLayout.addWidget(QLabel(":"))
+            #     self.periodicListsHBoxLayout.addWidget(
+            #         self.startTimeMinutesSpinBox)
+            #     self.periodicListsHBoxLayout.addWidget(
+            #         self.p1hrLineEdit)
+            #     self.form.addRow(self.periodicListsHBoxLayout)
+
+            # Start time
+            self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
+            self.weeklyStartTimeHoursSpinBox.setValue(
+                self.assignmentToEdit.get_weekly_start_time_hours_int()[0])
+            self.weeklyStartTimeHoursSpinBoxes.append(
+                self.startTimeHoursSpinBox)
+            self.weeklyStartTimeMinutesSpinBox = QSpinBox()  # Start time minutes
+            self.weeklyStartTimeMinutesSpinBox.setValue(
+                self.assignmentToEdit.get_start_time_minutes_int()[0])
+            self.weeklyStartTimeMinutesSpinBoxes.append(
+                self.weeklyStartTimeMinutesSpinBox)
+
+            # self.weeklyStartTimeHoursSpinBoxes = []
+            # self.weeklyStartTimeMinutesSpinBoxes = []
+
+            # for i in range(7):
+            #     self.periodicListsHBoxLayout2 = QHBoxLayout()
+            #     if i == 0:
+            #         weekday = "Monday"
+            #     elif i == 1:
+            #         weekday = "Tuesday"
+            #     elif i == 2:
+            #         weekday = "Wednesday"
+            #     elif i == 3:
+            #         weekday = "Thursday"
+            #     elif i == 4:
+            #         weekday = "Friday"
+            #     elif i == 5:
+            #         weekday = "Saturday"
+            #     elif i == 6:
+            #         weekday = "Sunday"
+            #     self.weeklyStartTimeLabel = QLabel(
+            #         "{0}".format(weekday))
+            #     self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
+            #     self.weeklyStartTimeHoursSpinBox.setValue(
+            #         self.assignmentToEdit.get_weekly_start_time_hours_int()[i])
+            #     self.weeklyStartTimeHoursSpinBoxes.append(
+            #         self.startTimeHoursSpinBox)
+            #     self.weeklyStartTimeMinutesSpinBox = QSpinBox()  # Start time minutes
+            #     self.weeklyStartTimeMinutesSpinBox.setValue(
+            #         self.assignmentToEdit.get_start_time_minutes_int()[i])
+            #     self.weeklyStartTimeMinutesSpinBoxes.append(
+            #         self.weeklyStartTimeMinutesSpinBox)
+
+            #     self.periodicListsHBoxLayout2.addWidget(
+            #         self.weeklyStartTimeLabel)
+            #     self.periodicListsHBoxLayout2.addWidget(
+            #         self.weeklyStartTimeHoursSpinBox)
+            #     self.periodicListsHBoxLayout2.addWidget(QLabel(":"))
+            #     self.periodicListsHBoxLayout2.addWidget(
+            #         self.weeklyStartTimeMinutesSpinBox)
+            #     self.form.addRow(self.periodicListsHBoxLayout2)
+
+            # self.startTimeAllHBoxLayout = QHBoxLayout()
+            # self.startTimeAllLabel = QLabel("Set start time for all days")
+            # self.startTimeAllHoursSpinBox = QSpinBox()  # Start time hour
+            # self.startTimeAllHoursSpinBox.setValue(
+            #     self.assignmentToEdit.get_start_time_hours_int()[0])
+            # self.startTimeAllMinutesSpinBox = QSpinBox()  # Start time minutes
+            # self.startTimeAllMinutesSpinBox.setValue(
+            #     self.assignmentToEdit.get_start_time_minutes_int()[0])
+            # self.startTimeAllPushButton = QPushButton("Set")
+            # self.startTimeAllPushButton.clicked.connect(self.setStartTimeAll)
+
+            self.startTimeAllHBoxLayout.addWidget(self.startTimeAllLabel)
+            self.startTimeAllHBoxLayout.addWidget(
+                self.startTimeAllHoursSpinBox)
+            self.startTimeAllHBoxLayout.addWidget(QLabel(":"))
+            self.startTimeAllHBoxLayout.addWidget(
+                self.startTimeAllMinutesSpinBox)
+            self.startTimeAllHBoxLayout.addWidget(self.startTimeAllPushButton)
+            self.form.addRow(self.startTimeAllHBoxLayout)
         else:  # Non Periodic assignments
 
             # creating the form
