@@ -1550,6 +1550,7 @@ class Ui_PushActivityScreen(QMainWindow):
                                 freeSpotAvailable = True
                                 save_in_personal_file()
                                 save_in_school_file()
+                                break
 
                     else:  # Assignment does not fit yet
                         if hourIndex + timeBlocks + 1 < len(self.usedMatrix):

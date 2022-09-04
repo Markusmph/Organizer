@@ -1480,14 +1480,15 @@ verb_dict = {
 available_time_per_day = dt.timedelta(0, 0, 0, 0, 0, 4)
 today = dt.datetime.today()
 
-# for category in personal.get_categ_list():
-#     for assignment in category.get_assignm_list():
-#         if isinstance(assignment, PersAssignmentPeriodic) and assignment.get_periodic_type() == 0:
-#             weekly_start_times = []
-#             for i in range(7):
-#                 weekly_start_times.append(assignment.get_start_time()[0])
-#             print(weekly_start_times)
-#             assignment.set_weekly_start_times(weekly_start_times)
+for category in personal.get_categ_list():
+    for assignment in category.get_assignm_list():
+        if isinstance(assignment, PersAssignmentPeriodic) and assignment.get_periodic_type() == 0:
+            weekly_start_times = []
+            for i in range(7):
+                weekly_start_times.append(assignment.get_start_time()[0])
+            print(weekly_start_times)
+            assignment.set_weekly_start_times(weekly_start_times)
+            print("Added weekly start times")
 # for i in range(len(assignment.get_start_time())):
 # if isinstance(assignment.get_start_time()[i], int):
 #     start_times = assignment.get_start_time()
@@ -1501,18 +1502,18 @@ today = dt.datetime.today()
 #             for i in range(7):
 #                 weekly_start_times.append(assignment.get_start_time())
 #             assignment.set_weekly_start_times(weekly_start_times)
-for category in school.get_subj_list() + personal.get_categ_list():
-    for assignment in category.get_assignm_list():
-        if isinstance(assignment, PersAssignmentPeriodic):
-            for i in range(len(assignment.get_start_time())):
-                if isinstance(assignment.get_start_time()[i], int):
-                    start_times = assignment.get_start_time()
-                    start_times[i] = dt.time(hour=0, minute=0)
-                    assignment.set_start_time(start_times)
-                    print("Changed")
+# for category in school.get_subj_list() + personal.get_categ_list():
+#     for assignment in category.get_assignm_list():
+#         if isinstance(assignment, PersAssignmentPeriodic):
+#             for i in range(len(assignment.get_start_time())):
+#                 if isinstance(assignment.get_start_time()[i], int):
+#                     start_times = assignment.get_start_time()
+#                     start_times[i] = dt.time(hour=0, minute=0)
+#                     assignment.set_start_time(start_times)
+#                     print("Changed")
 
 save_in_personal_file()
-save_in_school_file()
+# save_in_school_file()
 
 # while True:
 #     run_instruc(get_input())
