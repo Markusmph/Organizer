@@ -887,6 +887,7 @@ class Ui_EditAssignmentScreen(QMainWindow):
             # self.p1hrLineEdit.setText(
             #     str(self.assignmentToEdit.get_perc_in1hr()))
             # self.form.addRow(QLabel("Percentage in 1 hour"), self.p1hrLineEdit)
+        # Weekly periodic assignments
         elif isinstance(self.assignmentToEdit, PersAssignmentPeriodic) and self.assignmentToEdit.get_periodic_type() == 1:
             delivery_date_string = self.assignmentToEdit.get_delivery_date().strftime("%Y/%m/%d")
             # creating the form
@@ -903,45 +904,6 @@ class Ui_EditAssignmentScreen(QMainWindow):
             self.deliveryDateEdit.setDateTime(assignmentDate)
             self.form.addRow(QLabel("Start date"), self.deliveryDateEdit)
 
-            # # Start times
-            # self.startTimeHoursSpinBoxes = []
-            # self.startTimeMinutesSpinBoxes = []
-            # # P1hr list
-            # self.p1hrLineEdits = []
-
-            # self.periodicDaysToShow = 4
-
-            # for i in range(self.periodicDaysToShow):
-            #     delivery_date_string = (self.assignmentToEdit.get_delivery_date(
-            #     ) + timedelta(days=i*7)).strftime("%Y/%m/%d")
-            #     self.periodicListsHBoxLayout = QHBoxLayout()
-            #     self.startTimeLabel = QLabel(
-            #         "Date: {0}".format(delivery_date_string))
-            #     self.startTimeHoursSpinBox = QSpinBox()  # Start time hour
-            #     self.startTimeHoursSpinBox.setValue(
-            #         self.assignmentToEdit.get_start_time_hours_int()[i])
-            #     self.startTimeHoursSpinBoxes.append(self.startTimeHoursSpinBox)
-            #     self.startTimeMinutesSpinBox = QSpinBox()  # Start time minutes
-            #     self.startTimeMinutesSpinBox.setValue(
-            #         self.assignmentToEdit.get_start_time_minutes_int()[i])
-            #     self.startTimeMinutesSpinBoxes.append(
-            #         self.startTimeMinutesSpinBox)
-            #     self.p1hrLineEdit = QLineEdit()  # p1hr
-            #     self.p1hrLineEdit.setText(
-            #         str(self.assignmentToEdit.get_perc_in1hr()[i]))
-            #     self.p1hrLineEdits.append(
-            #         self.p1hrLineEdit)
-
-            #     self.periodicListsHBoxLayout.addWidget(self.startTimeLabel)
-            #     self.periodicListsHBoxLayout.addWidget(
-            #         self.startTimeHoursSpinBox)
-            #     self.periodicListsHBoxLayout.addWidget(QLabel(":"))
-            #     self.periodicListsHBoxLayout.addWidget(
-            #         self.startTimeMinutesSpinBox)
-            #     self.periodicListsHBoxLayout.addWidget(
-            #         self.p1hrLineEdit)
-            #     self.form.addRow(self.periodicListsHBoxLayout)
-
             # Start time
             self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
             self.weeklyStartTimeHoursSpinBox.setValue(
@@ -953,58 +915,6 @@ class Ui_EditAssignmentScreen(QMainWindow):
                 self.assignmentToEdit.get_start_time_minutes_int()[0])
             self.weeklyStartTimeMinutesSpinBoxes.append(
                 self.weeklyStartTimeMinutesSpinBox)
-
-            # self.weeklyStartTimeHoursSpinBoxes = []
-            # self.weeklyStartTimeMinutesSpinBoxes = []
-
-            # for i in range(7):
-            #     self.periodicListsHBoxLayout2 = QHBoxLayout()
-            #     if i == 0:
-            #         weekday = "Monday"
-            #     elif i == 1:
-            #         weekday = "Tuesday"
-            #     elif i == 2:
-            #         weekday = "Wednesday"
-            #     elif i == 3:
-            #         weekday = "Thursday"
-            #     elif i == 4:
-            #         weekday = "Friday"
-            #     elif i == 5:
-            #         weekday = "Saturday"
-            #     elif i == 6:
-            #         weekday = "Sunday"
-            #     self.weeklyStartTimeLabel = QLabel(
-            #         "{0}".format(weekday))
-            #     self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
-            #     self.weeklyStartTimeHoursSpinBox.setValue(
-            #         self.assignmentToEdit.get_weekly_start_time_hours_int()[i])
-            #     self.weeklyStartTimeHoursSpinBoxes.append(
-            #         self.startTimeHoursSpinBox)
-            #     self.weeklyStartTimeMinutesSpinBox = QSpinBox()  # Start time minutes
-            #     self.weeklyStartTimeMinutesSpinBox.setValue(
-            #         self.assignmentToEdit.get_start_time_minutes_int()[i])
-            #     self.weeklyStartTimeMinutesSpinBoxes.append(
-            #         self.weeklyStartTimeMinutesSpinBox)
-
-            #     self.periodicListsHBoxLayout2.addWidget(
-            #         self.weeklyStartTimeLabel)
-            #     self.periodicListsHBoxLayout2.addWidget(
-            #         self.weeklyStartTimeHoursSpinBox)
-            #     self.periodicListsHBoxLayout2.addWidget(QLabel(":"))
-            #     self.periodicListsHBoxLayout2.addWidget(
-            #         self.weeklyStartTimeMinutesSpinBox)
-            #     self.form.addRow(self.periodicListsHBoxLayout2)
-
-            # self.startTimeAllHBoxLayout = QHBoxLayout()
-            # self.startTimeAllLabel = QLabel("Set start time for all days")
-            # self.startTimeAllHoursSpinBox = QSpinBox()  # Start time hour
-            # self.startTimeAllHoursSpinBox.setValue(
-            #     self.assignmentToEdit.get_start_time_hours_int()[0])
-            # self.startTimeAllMinutesSpinBox = QSpinBox()  # Start time minutes
-            # self.startTimeAllMinutesSpinBox.setValue(
-            #     self.assignmentToEdit.get_start_time_minutes_int()[0])
-            # self.startTimeAllPushButton = QPushButton("Set")
-            # self.startTimeAllPushButton.clicked.connect(self.setStartTimeAll)
 
             self.startTimeAllHBoxLayout.addWidget(self.startTimeAllLabel)
             self.startTimeAllHBoxLayout.addWidget(
@@ -1046,6 +956,12 @@ class Ui_EditAssignmentScreen(QMainWindow):
                 str(self.assignmentToEdit.get_perc_in1hr()))
             self.form.addRow(QLabel("Percentage in 1 hour"), self.p1hrLineEdit)
 
+            self.pcompLineEdit = QLineEdit()  # Percentage completed
+            self.pcompLineEdit.setText(
+                str(self.assignmentToEdit.get_perc_completed()))
+            self.form.addRow(QLabel("Percentage completed"),
+                             self.pcompLineEdit)
+
         self.removePushButton = QPushButton("Remove")
         self.removePushButton.clicked.connect(self.removeAssignment)
         self.removePushButton.setStyleSheet(
@@ -1078,8 +994,9 @@ class Ui_EditAssignmentScreen(QMainWindow):
         delivery_date = datetime.strptime(
             self.deliveryDateEdit.date().toString('yyyy/MM/dd'), "%Y/%m/%d")
 
-        if self.list == "School":
+        if self.list == "School" and not isinstance(self.assignmentToEdit, PersAssignmentPeriodic):
             p1hr = float(self.p1hrLineEdit.text())
+            pcomp = float(self.pcompLineEdit.text())
             start_time_hours = int(self.startTimeHoursSpinBox.text())
             start_time_minutes = int(self.startTimeMinutesSpinBox.text())
             startTime = time(hour=start_time_hours,
@@ -1092,8 +1009,13 @@ class Ui_EditAssignmentScreen(QMainWindow):
                 self.assignmentIndex].set_start_time(startTime)
             school.get_subj_list()[self.subjectIndex].get_assignm_list()[
                 self.assignmentIndex].set_perc_in1hr(p1hr)
-
+            school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                self.assignmentIndex].set_perc_completed(pcomp)
+            if pcomp >= 100:
+                school.get_subj_list()[self.subjectIndex].set_as_completed(
+                    self.assignmentIndex)
             save_in_school_file()
+
         elif self.list == "Personal":
             if isinstance(self.assignmentToEdit, PersAssignmentPeriodic):
                 start_time_hours = []
@@ -1131,7 +1053,8 @@ class Ui_EditAssignmentScreen(QMainWindow):
                 start_time_minutes = int(self.startTimeMinutesSpinBox.text())
                 startTime = time(hour=start_time_hours,
                                  minute=start_time_minutes)
-                p1hr = int(float(self.p1hrLineEdit.text()))
+                p1hr = float(self.p1hrLineEdit.text())
+                pcomp = float(self.pcompLineEdit.text())
                 personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
                     self.assignmentIndex].set_name(assignment_name)
                 personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
@@ -1140,6 +1063,12 @@ class Ui_EditAssignmentScreen(QMainWindow):
                     self.assignmentIndex].set_start_time(startTime)
                 personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
                     self.assignmentIndex].set_perc_in1hr(p1hr)
+                personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_perc_completed(pcomp)
+
+                if pcomp >= 100:
+                    personal.get_categ_list()[self.subjectIndex].set_as_completed(
+                        self.assignmentIndex)
 
             save_in_personal_file()
 
