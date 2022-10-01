@@ -118,6 +118,10 @@ class Category:
     def add_assignm(self, new_assignm):
         self.assignm_list.append(new_assignm)
 
+    def set_as_completed(self, index):
+        self.completed.append(self.assignm_list[index])
+        del self.assignm_list[index]
+
     def set_completed(self, index, value):
         if (value == 100) and (type(self.assignm_list[index]) == PersAssignment):
             self.completed.append(self.assignm_list[index])

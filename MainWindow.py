@@ -99,6 +99,12 @@ def update_assignments():
                             pcompList.append(pcompList.pop(0))
                             personal.get_categ_list()[subject_index].get_assignm_list()[
                                 assignment_index].set_perc_completed(pcompList)
+                else:
+                    subject_index = personal.get_categ_list().index(subject)
+                    assignment_index = subject.get_assignm_list().index(assignment)
+                    personal.get_categ_list()[subject_index].get_assignm_list()[
+                        assignment_index].set_delivery_date(datetime.today())
+
                 save_in_personal_file()
 
 
