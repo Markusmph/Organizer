@@ -316,16 +316,34 @@ class PersAssignmentPeriodic(Assignment):
 
     def get_weekly_start_time_hours_int(self):
         self.weekly_start_times_hours_int = []
-        for i in range(7):
-            self.weekly_start_times_hours_int.append(
-                int(self.weekly_start_times[i].strftime("%H")))
+        try:
+            for i in range(7):
+                self.weekly_start_times_hours_int.append(
+                    int(self.weekly_start_times[i].strftime("%H")))
+        except AttributeError:
+            print("No weekly_start_times. Creating...")
+            self.weekly_start_times = []
+            for i in range(7):
+                self.weekly_start_times.append(self.get_start_time())
+            for i in range(7):
+                self.weekly_start_times_hours_int.append(
+                    int(self.weekly_start_times[i].strftime("%H")))
         return self.weekly_start_times_hours_int
 
     def get_weekly_start_time_minutes_int(self):
         self.weekly_start_times_minutes_int = []
-        for i in range(7):
-            self.weekly_start_times_minutes_int.append(
-                int(self.weekly_start_times[i].strftime("%M")))
+        try:
+            for i in range(7):
+                self.weekly_start_times_minutes_int.append(
+                    int(self.weekly_start_times[i].strftime("%M")))
+        except AttributeError:
+            print("No weekly_start_times. Creating...")
+            self.weekly_start_times = []
+            for i in range(7):
+                self.weekly_start_times.append(self.get_start_time())
+            for i in range(7):
+                self.weekly_start_times_minutes_int.append(
+                    int(self.weekly_start_times[i].strftime("%M")))
         return self.weekly_start_times_minutes_int
 
 
