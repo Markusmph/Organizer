@@ -1502,6 +1502,9 @@ today = dt.datetime.today()
 #             for i in range(7):
 #                 weekly_start_times.append(assignment.get_start_time())
 #             assignment.set_weekly_start_times(weekly_start_times)
+
+
+# Correr cada dia
 for category in school.get_subj_list() + personal.get_categ_list():
     for assignment in category.get_assignm_list():
         if isinstance(assignment, PersAssignmentPeriodic):
@@ -1511,9 +1514,26 @@ for category in school.get_subj_list() + personal.get_categ_list():
                     start_times[i] = dt.time(hour=0, minute=0)
                     assignment.set_start_time(start_times)
                     print("Changed")
-
 save_in_personal_file()
 save_in_school_file()
+
+
+# for category in school.get_subj_list() + personal.get_categ_list():
+#     for assignment in category.get_assignm_list():
+#         if isinstance(assignment, PersAssignmentPeriodic) and assignment.get_periodic_type() == 1:
+#             start_times = assignment.get_start_time()
+#             print(start_times)
+#         if assignment.get_name() == "Ver House of the Dragon":
+#             start_times = []
+#             for i in range(4):
+#                 start_times.append(dt.time(20, 0))
+#             print(start_times)
+#             print("El bueno")
+#             assignment.set_start_time(start_times)
+#             print("Ahora el modificado:")
+#             print(assignment.get_start_time())
+# save_in_personal_file()
+
 
 # while True:
 #     run_instruc(get_input())

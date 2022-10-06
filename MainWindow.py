@@ -99,6 +99,12 @@ def update_assignments():
                             pcompList.append(pcompList.pop(0))
                             personal.get_categ_list()[subject_index].get_assignm_list()[
                                 assignment_index].set_perc_completed(pcompList)
+                    elif assignment.get_periodic_type() == 1:
+                        days_difference = date2 - date1
+                        for i in range(days_difference.days):
+                            # Delivery date
+                            personal.get_categ_list()[subject_index].get_assignm_list()[
+                                assignment_index].set_delivery_date(assignment.get_delivery_date() + timedelta(days=1))
                 else:
                     subject_index = personal.get_categ_list().index(subject)
                     assignment_index = subject.get_assignm_list().index(assignment)
@@ -911,25 +917,27 @@ class Ui_EditAssignmentScreen(QMainWindow):
             self.form.addRow(QLabel("Start date"), self.deliveryDateEdit)
 
             # Start time
-            self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
-            self.weeklyStartTimeHoursSpinBox.setValue(
-                self.assignmentToEdit.get_weekly_start_time_hours_int()[0])
-            self.weeklyStartTimeHoursSpinBoxes.append(
-                self.startTimeHoursSpinBox)
-            self.weeklyStartTimeMinutesSpinBox = QSpinBox()  # Start time minutes
-            self.weeklyStartTimeMinutesSpinBox.setValue(
-                self.assignmentToEdit.get_start_time_minutes_int()[0])
-            self.weeklyStartTimeMinutesSpinBoxes.append(
-                self.weeklyStartTimeMinutesSpinBox)
+            self.StartTimeHourSpinBox = QSpinBox()  # Start time hour
+            self.StartTimeHourSpinBox.setValue(
+                self.assignmentToEdit.get_start_time_hours_int()[0])
 
-            self.startTimeAllHBoxLayout.addWidget(self.startTimeAllLabel)
-            self.startTimeAllHBoxLayout.addWidget(
-                self.startTimeAllHoursSpinBox)
-            self.startTimeAllHBoxLayout.addWidget(QLabel(":"))
-            self.startTimeAllHBoxLayout.addWidget(
-                self.startTimeAllMinutesSpinBox)
-            self.startTimeAllHBoxLayout.addWidget(self.startTimeAllPushButton)
-            self.form.addRow(self.startTimeAllHBoxLayout)
+            self.StartTimeMinuteSpinBox = QSpinBox()  # Start time minutes
+            self.StartTimeMinuteSpinBox.setValue(
+                self.assignmentToEdit.get_start_time_minutes_int()[0])
+
+            self.form.addRow(QLabel("Start time hours"),
+                             self.StartTimeHourSpinBox)
+            self.form.addRow(QLabel("Start time minutes"),
+                             self.StartTimeMinuteSpinBox)
+
+            # self.startTimeAllHBoxLayout.addWidget(self.startTimeAllLabel)
+            # self.startTimeAllHBoxLayout.addWidget(
+            #     self.startTimeAllHoursSpinBox)
+            # self.startTimeAllHBoxLayout.addWidget(QLabel(":"))
+            # self.startTimeAllHBoxLayout.addWidget(
+            #     self.startTimeAllMinutesSpinBox)
+            # self.startTimeAllHBoxLayout.addWidget(self.startTimeAllPushButton)
+            # self.form.addRow(self.startTimeAllHBoxLayout)
         else:  # Non Periodic assignments
 
             # creating the form
@@ -1023,7 +1031,7 @@ class Ui_EditAssignmentScreen(QMainWindow):
             save_in_school_file()
 
         elif self.list == "Personal":
-            if isinstance(self.assignmentToEdit, PersAssignmentPeriodic):
+            if isinstance(self.assignmentToEdit, PersAssignmentPeriodic) and self.assignmentToEdit.get_periodic_type() == 0:
                 start_time_hours = []
                 start_time_minutes = []
                 start_time_new = []
@@ -1054,6 +1062,17 @@ class Ui_EditAssignmentScreen(QMainWindow):
 
                 personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
                     self.assignmentIndex].set_perc_in1hr(p1hrList)
+            elif isinstance(self.assignmentToEdit, PersAssignmentPeriodic) and self.assignmentToEdit.get_periodic_type() == 1:
+                personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_name(assignment_name)
+                personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_delivery_date(delivery_date)
+                start_time_hours = int(self.StartTimeHourSpinBox.text())
+                start_time_minutes = int(self.StartTimeMinuteSpinBox.text())
+                startTime = time(hour=start_time_hours,
+                                 minute=start_time_minutes)
+                personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_start_time(startTime)
             else:
                 start_time_hours = int(self.startTimeHoursSpinBox.text())
                 start_time_minutes = int(self.startTimeMinutesSpinBox.text())
@@ -1774,7 +1793,10 @@ class Ui_PushDayScreen(QMainWindow):
 
 
 def getTimeIndex(deliveryTime):
+    # try:
     return int(deliveryTime.hour) * 2 + round(int(deliveryTime.minute) / 30)
+    # except AttributeError:
+    #     print(deliveryTime)
 
 
 def getTimeFromTimeIndex(timeIndex):

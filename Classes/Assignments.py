@@ -1,5 +1,6 @@
 import datetime as dt
 from calendar import monthrange
+# from multiprocessing import parent_process
 
 
 class Assignment:
@@ -288,15 +289,21 @@ class PersAssignmentPeriodic(Assignment):
     def get_start_time_hours_int(self):
         self.start_time_hours_int = []
         for i in range(30):
-            self.start_time_hours_int.append(
-                int(self.start_time[i].strftime("%H")))
+            try:
+                self.start_time_hours_int.append(
+                    int(self.start_time[i].strftime("%H")))
+            except IndexError:
+                pass
         return self.start_time_hours_int
 
     def get_start_time_minutes_int(self):
         self.start_time_minutes_int = []
         for i in range(30):
-            self.start_time_minutes_int.append(
-                int(self.start_time[i].strftime("%M")))
+            try:
+                self.start_time_minutes_int.append(
+                    int(self.start_time[i].strftime("%M")))
+            except IndexError:
+                pass
         return self.start_time_minutes_int
 
     def get_time_to_finish(self, i):
