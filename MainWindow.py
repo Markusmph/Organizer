@@ -254,8 +254,10 @@ class Ui_MainWindow(QMainWindow):
                             periodicIndex = math.floor(
                                 dayDifference.days / 7)
                             if periodicIndex < 4:
-                                hour_index = (int(assignment.get_start_time()[
-                                    periodicIndex].hour)*2) + round(int(assignment.get_start_time()[periodicIndex].minute) / 30) + 1
+                                hour_index = (assignment.get_start_time_hours_int()[
+                                    periodicIndex]*2) + round(assignment.get_start_time_minutes_int()[periodicIndex] / 30) + 1
+                                # hour_index = (int(assignment.get_start_time()[
+                                #     periodicIndex].hour)*2) + round(int(assignment.get_start_time()[periodicIndex].minute) / 30) + 1
                                 time_blocks = round(
                                     assignment.get_time_to_finish(periodicIndex) / 0.5)
                                 next_day = 0
@@ -498,6 +500,18 @@ class Ui_AddActivityScreen(QMainWindow):
 
         if category == "School":
             if self.new_assignment_periodic:
+                if periodic_number == 0:  # Daily
+                    start_time_list = []
+                    p1hrList = []
+                    pcompList = []
+                    for i in range(30):
+                        start_time_list.append(start_time)
+                        p1hrList.append(p1hr)
+                        pcompList.append(0)
+                    new_assignment = PersAssignmentPeriodic(
+                        assignment_name, delivery_date, periodic_number, start_time_list, perc_in_1hr=p1hrList, perc_completed=pcompList)
+                    school.get_subj_list()[subject_index].add_assignm(
+                        new_assignment)
                 if periodic_number == 1:  # Weekly
                     start_time_list = []
                     p1hrList = []
@@ -1028,6 +1042,59 @@ class Ui_EditAssignmentScreen(QMainWindow):
             if pcomp >= 100:
                 school.get_subj_list()[self.subjectIndex].set_as_completed(
                     self.assignmentIndex)
+            save_in_school_file()
+        elif self.list == "School" and isinstance(self.assignmentToEdit, PersAssignmentPeriodic):
+            if self.assignmentToEdit.get_periodic_type() == 0:
+                start_time_hours = []
+                start_time_minutes = []
+                start_time_new = []
+                p1hr_new = []
+                for i in range(self.periodicDaysToShow):
+                    start_time_hours.append(
+                        int(self.startTimeHoursSpinBoxes[i].text()))
+                    start_time_minutes.append(
+                        int(self.startTimeMinutesSpinBoxes[i].text()))
+                    start_time_new.append(
+                        time(hour=start_time_hours[i], minute=start_time_minutes[i]))
+                    p1hr_new.append(int(float(self.p1hrLineEdits[i].text())))
+
+                school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_name(assignment_name)
+                school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_delivery_date(delivery_date)
+
+                start_times = school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].get_start_time()
+                p1hrList = school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].get_perc_in1hr()
+                for i in range(self.periodicDaysToShow):
+                    start_times[i] = start_time_new[i]
+                    p1hrList[i] = p1hr_new[i]
+                school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_start_time(start_times)
+
+                school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_perc_in1hr(p1hrList)
+            elif self.assignmentToEdit.get_periodic_type() == 1:
+                # p1hr = float(self.p1hrLineEdit.text())
+                # pcomp = float(self.pcompLineEdit.text())
+                start_time_hours = int(self.StartTimeHourSpinBox.text())
+                start_time_minutes = int(self.StartTimeMinuteSpinBox.text())
+                startTime = time(hour=start_time_hours,
+                                 minute=start_time_minutes)
+                school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_name(assignment_name)
+                school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_delivery_date(delivery_date)
+                school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                    self.assignmentIndex].set_start_time(startTime)
+                # school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                #     self.assignmentIndex].set_perc_in1hr(p1hr)
+                # school.get_subj_list()[self.subjectIndex].get_assignm_list()[
+                #     self.assignmentIndex].set_perc_completed(pcomp)
+                # if pcomp >= 100:
+                #     school.get_subj_list()[self.subjectIndex].set_as_completed(
+                #         self.assignmentIndex)
             save_in_school_file()
 
         elif self.list == "Personal":

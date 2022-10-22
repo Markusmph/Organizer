@@ -294,6 +294,10 @@ class PersAssignmentPeriodic(Assignment):
                     int(self.start_time[i].strftime("%H")))
             except IndexError:
                 pass
+            except TypeError:
+                self.start_time_hours_int.append(
+                    int(self.start_time.hour))
+                #raise TypeError
         return self.start_time_hours_int
 
     def get_start_time_minutes_int(self):
@@ -304,6 +308,9 @@ class PersAssignmentPeriodic(Assignment):
                     int(self.start_time[i].strftime("%M")))
             except IndexError:
                 pass
+            except TypeError:
+                self.start_time_minutes_int.append(
+                    int(self.start_time.minute))
         return self.start_time_minutes_int
 
     def get_time_to_finish(self, i):
@@ -333,8 +340,12 @@ class PersAssignmentPeriodic(Assignment):
             for i in range(7):
                 self.weekly_start_times.append(self.get_start_time())
             for i in range(7):
-                self.weekly_start_times_hours_int.append(
-                    int(self.weekly_start_times[i].strftime("%H")))
+                try:
+                    self.weekly_start_times_hours_int.append(
+                        int(self.weekly_start_times[i].strftime("%H")))
+                except AttributeError:
+                    self.weekly_start_times_hours_int.append(
+                        int(self.weekly_start_times[i][0].hour))
         return self.weekly_start_times_hours_int
 
     def get_weekly_start_time_minutes_int(self):
