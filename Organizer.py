@@ -1507,7 +1507,7 @@ today = dt.datetime.today()
 # Correr cada dia
 for category in school.get_subj_list() + personal.get_categ_list():
     for assignment in category.get_assignm_list():
-        if isinstance(assignment, PersAssignmentPeriodic):
+        if isinstance(assignment, PersAssignmentPeriodic) and assignment.get_periodic_type() == 0:
             for i in range(len(assignment.get_start_time())):
                 if isinstance(assignment.get_start_time()[i], int):
                     start_times = assignment.get_start_time()
