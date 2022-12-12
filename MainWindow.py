@@ -414,14 +414,16 @@ class Ui_AddActivityScreen(QMainWindow):
 
         self.categoryComboBox = QComboBox()  # Category list
         self.categoryComboBox.addItems(["School", "Personal"])
+        self.categoryComboBox.currentTextChanged.connect(
+            self.onCategoryComboboxChanged)
         self.form.addRow(QLabel("Category"), self.categoryComboBox)
 
         self.subjectComboBox = QComboBox()  # Subject
         subject_names = []
         for subject in school.get_subj_list():
             subject_names.append(subject.get_name())
-        for category in personal.get_categ_list():
-            subject_names.append(category.get_name())
+        # for category in personal.get_categ_list():
+        #     subject_names.append(category.get_name())
         self.subjectComboBox.addItems(subject_names)
         self.form.addRow(QLabel("Subject"), self.subjectComboBox)
 
@@ -479,9 +481,16 @@ class Ui_AddActivityScreen(QMainWindow):
         assignment_name = self.assignmentNameLineEdit.text()
         category = self.categoryComboBox.currentText()
         subject_index = self.subjectComboBox.currentIndex()
-        if subject_index >= len(school.get_subj_list()):
-            subject_index_personal_list = subject_index - \
-                len(school.get_subj_list())
+        # if category == "School":
+        #     subject_index =
+        # elif category == "Personal":
+        #     pass
+        # else:
+        #     raise Exception("The category selected does not exist")
+
+        # if subject_index >= len(school.get_subj_list()):
+        #     subject_index_personal_list = subject_index - \
+        #         len(school.get_subj_list())
         delivery_date = datetime.strptime(
             self.deliveryDateEdit.date().toString("yyyy/MM/dd"), '%Y/%m/%d')
         start_time_hours = int(self.startTimeHoursSpinBox.text())
@@ -553,7 +562,7 @@ class Ui_AddActivityScreen(QMainWindow):
                     p1hrList.append(p1hr)
                 new_assignment = PersAssignmentPeriodic(
                     assignment_name, delivery_date, periodic_number, start_time_list, perc_in_1hr=p1hrList)
-                personal.get_categ_list()[subject_index_personal_list].add_assignm(
+                personal.get_categ_list()[subject_index].add_assignm(
                     new_assignment)
             elif periodic_number == 1:  # Weekly
                 start_time_list = []
@@ -579,14 +588,14 @@ class Ui_AddActivityScreen(QMainWindow):
                     weeklyPeriodicDayInt = 6
                 new_assignment = PersAssignmentPeriodic(
                     assignment_name, delivery_date, periodic_number, start_time_list, perc_in_1hr=p1hrList, perc_completed=pcompList, weekly_periodic_day_int=weeklyPeriodicDayInt)
-                personal.get_categ_list()[subject_index_personal_list].add_assignm(
+                personal.get_categ_list()[subject_index].add_assignm(
                     new_assignment)
             save_in_personal_file()
         else:
             start_time = time(hour=start_time_hours, minute=start_time_minutes)
             new_assignment = PersAssignment(
                 assignment_name, delivery_date, start_time, perc_in_1hr=p1hr)
-            personal.get_categ_list()[subject_index_personal_list].add_assignm(
+            personal.get_categ_list()[subject_index].add_assignm(
                 new_assignment)
             save_in_personal_file()
 
@@ -596,6 +605,20 @@ class Ui_AddActivityScreen(QMainWindow):
 
     def periodicCheckBoxClick(self, state):
         self.new_assignment_periodic = state == Qt.Checked
+
+    def onCategoryComboboxChanged(self, value):
+        subject_names = []
+        if value == "School":
+            for subject in school.get_subj_list():
+                subject_names.append(subject.get_name())
+        elif value == "Personal":
+            for subject in personal.get_categ_list():
+                subject_names.append(subject.get_name())
+        else:
+            raise Exception("The category selected does not exist")
+
+        self.subjectComboBox.clear()
+        self.subjectComboBox.addItems(subject_names)
 
     def onPeriodicComboboxChanged(self, value):
         # self.periodicComboBox = QComboBox()  # Category list
