@@ -1517,6 +1517,10 @@ for category in school.get_subj_list() + personal.get_categ_list():
 save_in_personal_file()
 save_in_school_file()
 
+# Borrar subject
+# print("Deliting " + school.get_subj_list()[20].get_name())
+# del school.get_subj_list()[20]
+# save_in_school_file()
 
 # for category in school.get_subj_list() + personal.get_categ_list():
 #     for assignment in category.get_assignm_list():
