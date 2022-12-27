@@ -37,27 +37,38 @@ def save_in_personal_file():
 
 
 def update_assignments():
+
+    # School
     for subject in school.get_subj_list():
         for assignment in subject.get_assignm_list():
-            try:
-                if assignment.get_delivery_date() < datetime.today():
-                    subject_index = school.get_subj_list().index(subject)
-                    assignment_index = subject.get_assignm_list().index(assignment)
-                    school.get_subj_list()[subject_index].get_assignm_list()[
-                        assignment_index].set_delivery_date(datetime.today())
-            except TypeError:
-                date1 = assignment.get_delivery_date()
-                date2 = datetime.today()
-                if isinstance(date1, date):
-                    date1 = datetime.combine(date1, datetime.min.time())
-                if isinstance(date2, date):
-                    date2 = datetime.combine(date2, datetime.min.time())
-                if date1 < date2:
-                    subject_index = school.get_subj_list().index(subject)
-                    assignment_index = subject.get_assignm_list().index(assignment)
-                    school.get_subj_list()[subject_index].get_assignm_list()[
-                        assignment_index].set_delivery_date(datetime.today())
-                    save_in_school_file()
+            date1 = assignment.get_delivery_date()
+            date2 = datetime.today()
+            if isinstance(date1, date):
+                date1 = datetime.combine(date1, datetime.min.time())
+            if isinstance(date2, date):
+                date2 = datetime.combine(date2, datetime.min.time())
+            if date1 < date2:
+                subject_index = school.get_subj_list().index(subject)
+                assignment_index = subject.get_assignm_list().index(assignment)
+                school.get_subj_list()[subject_index].get_assignm_list()[
+                    assignment_index].set_delivery_date(datetime.today())
+                save_in_school_file()
+
+            if isinstance(assignment, PersAssignmentPeriodic):
+                if assignment.get_periodic_type() == 0:
+                    days_difference = date2 - date1
+                    for i in range(days_difference.days):
+                        # Start times
+                        start_times = school.get_subj_list()[subject_index].get_assignm_list()[
+                            assignment_index].get_start_time()
+                        lastDay = assignment.get_delivery_date() + timedelta(days=len(start_times))
+                        start_time_eliminated = start_times.pop(0)
+                        start_times.append(start_time_eliminated)
+                        school.get_subj_list()[subject_index].get_assignm_list()[
+                            assignment_index].set_start_time(start_times)
+                save_in_school_file()
+
+    # Personal
     for subject in personal.get_categ_list():
         for assignment in subject.get_assignm_list():
             date1 = assignment.get_delivery_date()
@@ -83,8 +94,8 @@ def update_assignments():
                             start_times = personal.get_categ_list()[subject_index].get_assignm_list()[
                                 assignment_index].get_start_time()
                             lastDay = assignment.get_delivery_date() + timedelta(days=len(start_times))
-                            start_times.pop(0)
-                            start_times.append(lastDay.weekday())
+                            start_time_eliminated = start_times.pop(0)
+                            start_times.append(start_time_eliminated)
                             personal.get_categ_list()[subject_index].get_assignm_list()[
                                 assignment_index].set_start_time(start_times)
                             # p1hr
@@ -93,12 +104,12 @@ def update_assignments():
                             p1hrList.append(p1hrList.pop(0))
                             personal.get_categ_list()[subject_index].get_assignm_list()[
                                 assignment_index].set_perc_in1hr(p1hrList)
-                            # pcomp
-                            pcompList = personal.get_categ_list()[subject_index].get_assignm_list()[
-                                assignment_index].get_perc_completed()
-                            pcompList.append(pcompList.pop(0))
-                            personal.get_categ_list()[subject_index].get_assignm_list()[
-                                assignment_index].set_perc_completed(pcompList)
+                            # # pcomp
+                            # pcompList = personal.get_categ_list()[subject_index].get_assignm_list()[
+                            #     assignment_index].get_perc_completed()
+                            # pcompList.append(pcompList.pop(0))
+                            # personal.get_categ_list()[subject_index].get_assignm_list()[
+                            #     assignment_index].set_perc_completed(pcompList)
                     elif assignment.get_periodic_type() == 1:
                         days_difference = date2 - date1
                         for i in range(days_difference.days):
