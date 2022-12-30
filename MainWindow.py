@@ -63,7 +63,9 @@ def update_assignments():
                             assignment_index].get_start_time()
                         lastDay = assignment.get_delivery_date() + timedelta(days=len(start_times))
                         start_time_eliminated = start_times.pop(0)
-                        start_times.append(start_time_eliminated)
+                        new_start_time = assignment.get_weekly_start_times()[
+                            lastDay.weekday()]
+                        start_times.append(new_start_time)
                         school.get_subj_list()[subject_index].get_assignm_list()[
                             assignment_index].set_start_time(start_times)
                 save_in_school_file()
@@ -95,7 +97,9 @@ def update_assignments():
                                 assignment_index].get_start_time()
                             lastDay = assignment.get_delivery_date() + timedelta(days=len(start_times))
                             start_time_eliminated = start_times.pop(0)
-                            start_times.append(start_time_eliminated)
+                            new_start_time = assignment.get_weekly_start_times()[
+                                lastDay.weekday()]
+                            start_times.append(new_start_time)
                             personal.get_categ_list()[subject_index].get_assignm_list()[
                                 assignment_index].set_start_time(start_times)
                             # p1hr
@@ -881,47 +885,79 @@ class Ui_EditAssignmentScreen(QMainWindow):
                     self.p1hrLineEdit)
                 self.form.addRow(self.periodicListsHBoxLayout)
 
-            # Start times
-            self.weeklyStartTimeHoursSpinBoxes = []
-            self.weeklyStartTimeMinutesSpinBoxes = []
+            self.startTimeWeeklyHBoxLayout = QHBoxLayout()
+            self.startTimeWeeklyLabel = QLabel("Set weekly start times")
+            self.dayComboBox = QComboBox()  # Day
+            self.dayComboBox.addItems(
+                ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+            self.daySelected = 0
+            # self.dayComboBox.currentTextChanged.connect(
+            #     self.onDayComboboxChanged)
+            self.startTimeWeeklyHoursSpinBox = QSpinBox()  # Start time hour
+            self.startTimeWeeklyHoursSpinBox.setValue(
+                self.assignmentToEdit.get_weekly_start_time_hours_int()[0])
+            self.startTimeWeeklyMinutesSpinBox = QSpinBox()  # Start time minutes
+            self.startTimeWeeklyMinutesSpinBox.setValue(
+                self.assignmentToEdit.get_weekly_start_time_minutes_int()[0])
+            self.startTimeWeeklyPushButton = QPushButton("Set")
+            self.startTimeWeeklyPushButton.clicked.connect(
+                self.setStartTimeWeekly)
 
-            for i in range(7):
-                self.periodicListsHBoxLayout2 = QHBoxLayout()
-                if i == 0:
-                    weekday = "Monday"
-                elif i == 1:
-                    weekday = "Tuesday"
-                elif i == 2:
-                    weekday = "Wednesday"
-                elif i == 3:
-                    weekday = "Thursday"
-                elif i == 4:
-                    weekday = "Friday"
-                elif i == 5:
-                    weekday = "Saturday"
-                elif i == 6:
-                    weekday = "Sunday"
-                self.weeklyStartTimeLabel = QLabel(
-                    "{0}".format(weekday))
-                self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
-                self.weeklyStartTimeHoursSpinBox.setValue(
-                    self.assignmentToEdit.get_weekly_start_time_hours_int()[i])
-                self.weeklyStartTimeHoursSpinBoxes.append(
-                    self.startTimeHoursSpinBox)
-                self.weeklyStartTimeMinutesSpinBox = QSpinBox()  # Start time minutes
-                self.weeklyStartTimeMinutesSpinBox.setValue(
-                    self.assignmentToEdit.get_start_time_minutes_int()[i])
-                self.weeklyStartTimeMinutesSpinBoxes.append(
-                    self.weeklyStartTimeMinutesSpinBox)
+            self.startTimeWeeklyHBoxLayout.addWidget(self.startTimeWeeklyLabel)
+            self.startTimeWeeklyHBoxLayout.addWidget(self.dayComboBox)
+            self.startTimeWeeklyHBoxLayout.addWidget(
+                self.startTimeWeeklyHoursSpinBox)
+            self.startTimeWeeklyHBoxLayout.addWidget(QLabel(":"))
+            self.startTimeWeeklyHBoxLayout.addWidget(
+                self.startTimeWeeklyMinutesSpinBox)
+            self.startTimeWeeklyHBoxLayout.addWidget(
+                self.startTimeWeeklyPushButton)
+            self.form.addRow(self.startTimeWeeklyHBoxLayout)
 
-                self.periodicListsHBoxLayout2.addWidget(
-                    self.weeklyStartTimeLabel)
-                self.periodicListsHBoxLayout2.addWidget(
-                    self.weeklyStartTimeHoursSpinBox)
-                self.periodicListsHBoxLayout2.addWidget(QLabel(":"))
-                self.periodicListsHBoxLayout2.addWidget(
-                    self.weeklyStartTimeMinutesSpinBox)
-                self.form.addRow(self.periodicListsHBoxLayout2)
+            # # Start times
+            # self.weeklyStartTimeHoursSpinBoxes = []
+            # self.weeklyStartTimeMinutesSpinBoxes = []
+
+            # for i in range(7):
+            #     self.periodicListsHBoxLayout2 = QHBoxLayout()
+            #     if i == 0:
+            #         weekday = "Monday"
+            #     elif i == 1:
+            #         weekday = "Tuesday"
+            #     elif i == 2:
+            #         weekday = "Wednesday"
+            #     elif i == 3:
+            #         weekday = "Thursday"
+            #     elif i == 4:
+            #         weekday = "Friday"
+            #     elif i == 5:
+            #         weekday = "Saturday"
+            #     elif i == 6:
+            #         weekday = "Sunday"
+            #     self.weeklyStartTimeLabel = QLabel(
+            #         "{0}".format(weekday))
+            #     self.weeklyStartTimeHoursSpinBox = QSpinBox()  # Start time hour
+            #     self.weeklyStartTimeHoursSpinBox.setValue(
+            #         self.assignmentToEdit.get_weekly_start_time_hours_int()[i])
+            #     self.weeklyStartTimeHoursSpinBoxes.append(
+            #         self.startTimeHoursSpinBox)
+            #     self.weeklyStartTimeMinutesSpinBox = QSpinBox()  # Start time minutes
+            #     self.weeklyStartTimeMinutesSpinBox.setValue(
+            #         self.assignmentToEdit.get_start_time_minutes_int()[i])
+            #     self.weeklyStartTimeMinutesSpinBoxes.append(
+            #         self.weeklyStartTimeMinutesSpinBox)
+
+            #     self.periodicListsHBoxLayout2.addWidget(
+            #         self.weeklyStartTimeLabel)
+            #     self.periodicListsHBoxLayout2.addWidget(
+            #         self.weeklyStartTimeHoursSpinBox)
+            #     self.periodicListsHBoxLayout2.addWidget(QLabel(":"))
+            #     self.periodicListsHBoxLayout2.addWidget(
+            #         self.weeklyStartTimeMinutesSpinBox)
+            #     self.form.addRow(self.periodicListsHBoxLayout2)
+
+            #     self.startTimeAllPushButton = QPushButton("Set")
+            #     self.startTimeAllPushButton.clicked.connect(self.setStartTimeAll)
 
             self.startTimeAllHBoxLayout = QHBoxLayout()
             self.startTimeAllLabel = QLabel("Set start time for all days")
@@ -1210,6 +1246,26 @@ class Ui_EditAssignmentScreen(QMainWindow):
         for i in range(len(startTimes)):
             startTimes[i] = time(hour=int(self.startTimeAllHoursSpinBox.text()), minute=int(
                 self.startTimeAllMinutesSpinBox.text()))
+        personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
+            self.assignmentIndex].set_start_time(startTimes)
+        save_in_personal_file()
+
+        # Set Main Window
+        mainWindow = Ui_MainWindow()
+        widget.addWidget(mainWindow)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def setStartTimeWeekly(self):
+        startTimes = self.assignmentToEdit.get_start_time()
+        daySelectedInt = self.dayComboBox.currentIndex()
+        newStartTime = time(hour=int(self.startTimeWeeklyHoursSpinBox.text()), minute=int(
+            self.startTimeWeeklyMinutesSpinBox.text()))
+        delivery_date = self.assignmentToEdit.get_delivery_date()
+        for i in range(len(startTimes)):
+            # Preguntar si la start time cae en el dia a editar
+            new_day = delivery_date + timedelta(days=i)
+            if new_day.weekday() == daySelectedInt:
+                startTimes[i] = newStartTime
         personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
             self.assignmentIndex].set_start_time(startTimes)
         save_in_personal_file()
