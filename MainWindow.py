@@ -248,7 +248,7 @@ class Ui_MainWindow(QMainWindow):
                                 self.simultaneous_matrix[hour_index +
                                                          j - 1][i + next_day] = True
                             else:
-                                color = "lightblue"
+                                color = assignment.get_color_string()
                                 self.used_matrix[hour_index +
                                                  j - 1][i + next_day] = True
                             self.gridbox.addWidget(
@@ -290,7 +290,7 @@ class Ui_MainWindow(QMainWindow):
                                         self.simultaneous_matrix[hour_index +
                                                                  j - 1][i + next_day] = True
                                     else:
-                                        color = "lightblue"
+                                        color = assignment.get_color_string()
                                         self.used_matrix[hour_index +
                                                          j - 1][i + next_day] = True
                                     self.gridbox.addWidget(
@@ -320,10 +320,11 @@ class Ui_MainWindow(QMainWindow):
                             else:
                                 self.used_matrix[hour_index +
                                                  j - 1][i + next_day] = True
-                                if subject_name[assignments.index(assignment)] == "Personal":
-                                    color = "lightblue"
-                                else:
-                                    color = "lightgrey"
+                                color = assignment.get_color_string()
+                                # if subject_name[assignments.index(assignment)] == "Personal":
+                                #     color = "lightblue"
+                                # else:
+                                #     color = "lightgrey"
                             self.gridbox.addWidget(
                                 label_assignment, hour_index+j, i+2 + next_day)
                             label_assignment.setStyleSheet(
@@ -804,6 +805,7 @@ class Ui_EditScreen(QMainWindow):
 
 
 class Ui_EditAssignmentScreen(QMainWindow):
+
     def __init__(self, assignmentName, perviousScreenIndex):
         super().__init__()
 
@@ -1022,7 +1024,9 @@ class Ui_EditAssignmentScreen(QMainWindow):
             #     self.startTimeAllMinutesSpinBox)
             # self.startTimeAllHBoxLayout.addWidget(self.startTimeAllPushButton)
             # self.form.addRow(self.startTimeAllHBoxLayout)
-        else:  # Non Periodic assignments
+
+        # Non Periodic assignments
+        else:
 
             # creating the form
             self.assignmentNameLineEdit = QLineEdit()  # Assignment name
@@ -1060,6 +1064,33 @@ class Ui_EditAssignmentScreen(QMainWindow):
             self.form.addRow(QLabel("Percentage completed"),
                              self.pcompLineEdit)
 
+        colors = ["lightblue", "lightgrey", "azure",
+                  "beige", "lightgoldenrodyellow", "bisque",
+                  "gold", "honeydew", "khaki", "lavender",
+                  "lavenderblush", "lemonchiffon", "lightcoral",
+                  "lightcyan", "lightgoldenrodyellow", "lightpink",
+                  "lightsalmon", "lightseagreen", "lightskyblue",
+                  "lightsteelblue", "lightyellow", "lime", "linen",
+                  "magenta", "mediumorchid", "mediumseagreen",
+                  "mediumspringgreen", "mediumslateblue",
+                  "mintcream", "orange", "palegreen", "plum"]
+        self.colorStringComboBox = QComboBox()  # color
+        self.colorStringComboBox.addItems(colors)
+        self.colorStringComboBoxLabel = QLabel("Category color")
+        self.colorStringComboBox.currentTextChanged.connect(
+            self.onColorStringComboboxChanged)
+        self.form.addRow(self.colorStringComboBoxLabel,
+                         self.colorStringComboBox)
+
+        index = self.colorStringComboBox.findText(
+            self.assignmentToEdit.get_color_string(), Qt.MatchFixedString)
+        # print(self.assignmentToEdit.get_color_string())
+        # print(index)
+        if index >= 0:
+            self.colorStringComboBox.setCurrentIndex(index)
+        self.colorStringComboBoxLabel.setStyleSheet(
+            "background-color: " + self.colorStringComboBox.currentText())
+
         self.removePushButton = QPushButton("Remove")
         self.removePushButton.clicked.connect(self.removeAssignment)
         self.removePushButton.setStyleSheet(
@@ -1085,6 +1116,11 @@ class Ui_EditAssignmentScreen(QMainWindow):
 
         self.setGeometry(600, 100, 1000, 900)
         self.setWindowTitle('Organizer')
+
+    def onColorStringComboboxChanged(self, value):
+        # newColor = self.colorStringComboBox.currentText()
+        self.colorStringComboBoxLabel.setStyleSheet(
+            "background-color: " + value)
 
     def saveValues(self):
 

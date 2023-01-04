@@ -4,13 +4,14 @@ from calendar import monthrange
 
 
 class Assignment:
-    def __init__(self, id, name, delivery_date, duration, start_time, perc_completed=0):
+    def __init__(self, id, name, delivery_date, duration, start_time, perc_completed=0, colorString="lightblue"):
         self.id = id
         self.name = name
         self.duration = duration
         self.delivery_date = delivery_date
         self.start_time = start_time
         self.perc_completed = perc_completed
+        self.colorString = colorString
 
     def set_id(self, assignment_id):
         self.id = assignment_id
@@ -29,6 +30,9 @@ class Assignment:
 
     def set_perc_completed(self, new_perc_completed):
         self.perc_completed = new_perc_completed
+
+    def set_color_string(self, colorString):
+        self.colorString = colorString
 
     def get_id(self):
         return self.id
@@ -57,9 +61,12 @@ class Assignment:
     def get_time_to_finish(self):
         return ((100 - self.perc_completed)/self.perc_in_1hr)
 
+    def get_color_string(self):
+        return self.colorString
+
 
 class Homework(Assignment):
-    def __init__(self, hw_id, name, delivery_date, start_time=dt.time(hour=0, minute=0), perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory=True):
+    def __init__(self, hw_id, name, delivery_date, start_time=dt.time(hour=0, minute=0), perc_in_1hr=100, perc_completed=0, recomended_date=True, mandatory=True, colorString="lightblue"):
         self.id = hw_id
         self.name = name
         self.delivery_date = delivery_date
@@ -72,6 +79,7 @@ class Homework(Assignment):
             self.recomended_date = recomended_date
         self.mandatory = mandatory
         self.late = False
+        self.colorString = colorString
 
     def set_perc_in1hr(self, perc):
         self.perc_in_1hr = perc
@@ -132,13 +140,14 @@ class Exam(Assignment):
 
 
 class PersAssignment(Assignment):
-    def __init__(self, name, delivery_date, start_time=dt.time(hour=0, minute=0), perc_in_1hr=100, perc_completed=0, mandatory=False):
+    def __init__(self, name, delivery_date, start_time=dt.time(hour=0, minute=0), perc_in_1hr=100, perc_completed=0, mandatory=False, colorString="lightblue"):
         self.name = name
         self.delivery_date = delivery_date
         self.start_time = start_time
         self.perc_in_1hr = perc_in_1hr
         self.perc_completed = perc_completed
         self.mandatory = mandatory
+        self.colorString = colorString
 
     def set_delivery_date(self, new_delivery_date):
         self.delivery_date = new_delivery_date
@@ -172,7 +181,7 @@ class PersAssignment(Assignment):
 
 
 class PersAssignmentPeriodic(Assignment):
-    def __init__(self, name, delivery_date, periodic_type, start_time, perc_in_1hr=100, perc_completed=0, mandatory=False, weekly_periodic_day_int=0):
+    def __init__(self, name, delivery_date, periodic_type, start_time, perc_in_1hr=100, perc_completed=0, mandatory=False, weekly_periodic_day_int=0, colorString="lightblue"):
         self.name = name
         self.delivery_date = delivery_date
         self.periodic_type = periodic_type
@@ -182,6 +191,7 @@ class PersAssignmentPeriodic(Assignment):
         self.delivery_date = delivery_date
         self.start_time = start_time  # Array
         self.weekly_periodic_day_int = weekly_periodic_day_int
+        self.colorString = colorString
 
     def set_delivery_dates(self):
         if self.periodic_type == 0:  # Every day

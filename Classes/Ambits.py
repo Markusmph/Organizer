@@ -68,10 +68,11 @@ class Personal(Ambit):
 
 
 class Subject:
-    def __init__(self, name, assignm_list=[]):
+    def __init__(self, name, assignm_list=[], colorString="lightgray"):
         self.name = name
         self.assignm_list = assignm_list
         self.completed = []
+        self.colorString = colorString
 
     def add_assignm(self, new_assignm):
         self.assignm_list.append(new_assignm)
@@ -79,6 +80,9 @@ class Subject:
 
     def set_assignm_list(self, assignm_list):
         self.assignm_list = assignm_list
+
+    def set_color_string(self, colorString):
+        self.colorString = colorString
 
     def remove_assignm(self, index):
         pass
@@ -105,12 +109,16 @@ class Subject:
     def get_completed_list(self):
         return self.completed
 
+    def get_color_string(self):
+        return self.colorString
+
 
 class Category:
-    def __init__(self, name, assignm_list=[]):
+    def __init__(self, name, assignm_list=[], colorString="lightblue"):
         self.name = name
         self.assignm_list = assignm_list
         self.completed = []
+        self.colorString = colorString
 
     def set_name(self, name):
         self.name = name
@@ -129,6 +137,9 @@ class Category:
         else:
             self.assignm_list[index].set_completed(value)
 
+    def set_color_string(self, colorString):
+        self.colorString = colorString
+
     def get_name(self):
         return self.name
 
@@ -137,5 +148,8 @@ class Category:
 
     def get_completed_list(self):
         return self.completed
+
+    def get_color_string(self):
+        return self.colorString
 
 # ------------------------------------------------------

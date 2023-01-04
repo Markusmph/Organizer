@@ -1505,17 +1505,17 @@ today = dt.datetime.today()
 
 
 # Correr cada dia
-for category in school.get_subj_list() + personal.get_categ_list():
-    for assignment in category.get_assignm_list():
-        if isinstance(assignment, PersAssignmentPeriodic) and assignment.get_periodic_type() == 0:
-            for i in range(len(assignment.get_start_time())):
-                if isinstance(assignment.get_start_time()[i], int):
-                    start_times = assignment.get_start_time()
-                    start_times[i] = dt.time(hour=0, minute=0)
-                    assignment.set_start_time(start_times)
-                    print("Changed")
-save_in_personal_file()
-save_in_school_file()
+# for category in school.get_subj_list() + personal.get_categ_list():
+#     for assignment in category.get_assignm_list():
+#         if isinstance(assignment, PersAssignmentPeriodic) and assignment.get_periodic_type() == 0:
+#             for i in range(len(assignment.get_start_time())):
+#                 if isinstance(assignment.get_start_time()[i], int):
+#                     start_times = assignment.get_start_time()
+#                     start_times[i] = dt.time(hour=0, minute=0)
+#                     assignment.set_start_time(start_times)
+#                     print("Changed")
+# save_in_personal_file()
+# save_in_school_file()
 
 # Borrar subject
 # print("Deliting " + school.get_subj_list()[23].get_name())
@@ -1541,6 +1541,17 @@ save_in_school_file()
 
 # while True:
 #     run_instruc(get_input())
+
+# Set color to categories
+for category in school.get_subj_list():
+    for assignment in category.get_assignm_list():
+        assignment.set_color_string("lightgrey")
+save_in_school_file()
+
+for category in personal.get_categ_list():
+    for assignment in category.get_assignm_list():
+        assignment.set_color_string("lightgrey")
+save_in_personal_file()
 
 # TODO: display one assignment
 # TODO: clean up code
