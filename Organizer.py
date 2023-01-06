@@ -1518,8 +1518,8 @@ today = dt.datetime.today()
 # save_in_school_file()
 
 # Borrar subject
-# print("Deliting " + school.get_subj_list()[23].get_name())
-# del school.get_subj_list()[23]
+# print("Deliting " + school.get_subj_list()[26].get_name())
+# del school.get_subj_list()[26]
 # save_in_school_file()
 
 # for category in school.get_subj_list() + personal.get_categ_list():
@@ -1543,15 +1543,15 @@ today = dt.datetime.today()
 #     run_instruc(get_input())
 
 # Set color to categories
-for category in school.get_subj_list():
-    for assignment in category.get_assignm_list():
-        assignment.set_color_string("lightgrey")
-save_in_school_file()
+# for category in school.get_subj_list():
+#     for assignment in category.get_assignm_list():
+#         assignment.set_color_string("lightgrey")
+# save_in_school_file()
 
-for category in personal.get_categ_list():
-    for assignment in category.get_assignm_list():
-        assignment.set_color_string("lightgrey")
-save_in_personal_file()
+# for category in personal.get_categ_list():
+#     for assignment in category.get_assignm_list():
+#         assignment.set_color_string("lightgrey")
+# save_in_personal_file()
 
 # TODO: display one assignment
 # TODO: clean up code
