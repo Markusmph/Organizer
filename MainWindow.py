@@ -339,32 +339,44 @@ class Ui_MainWindow(QMainWindow):
             self.gridbox.addWidget(label, i+1, 1)
 
         # Add Buttons
+        grid_position = 0
         addActivityButton = QPushButton("Add activity")
-        self.gridbox.addWidget(addActivityButton, 0, 0)
+        self.gridbox.addWidget(addActivityButton, grid_position, 0)
         addActivityButton.clicked.connect(self.gotoAddActivityScreen)
 
+        grid_position = grid_position + 1
         addSubjectButton = QPushButton("Add subject")
-        self.gridbox.addWidget(addSubjectButton, 1, 0)
+        self.gridbox.addWidget(addSubjectButton, grid_position, 0)
         addSubjectButton.clicked.connect(self.gotoAddSubjectScreen)
 
+        grid_position = grid_position + 1
         edit_button = QPushButton("Edit activity")
-        self.gridbox.addWidget(edit_button, 2, 0)
+        self.gridbox.addWidget(edit_button, grid_position, 0)
         edit_button.clicked.connect(self.gotoEditScreen)
 
+        grid_position = grid_position + 1
+        edit_subject_button = QPushButton("Edit subject")
+        self.gridbox.addWidget(edit_subject_button, grid_position, 0)
+        edit_subject_button.clicked.connect(self.gotoEditSubjectScreen)
+
+        grid_position = grid_position + 1
         simultaneous_button = QPushButton("Edit simultaneous activities")
-        self.gridbox.addWidget(simultaneous_button, 3, 0)
+        self.gridbox.addWidget(simultaneous_button, grid_position, 0)
         simultaneous_button.clicked.connect(self.gotoSimultaneousScreen)
 
+        grid_position = grid_position + 1
         pushActivityButton = QPushButton("Push activity")
-        self.gridbox.addWidget(pushActivityButton, 4, 0)
+        self.gridbox.addWidget(pushActivityButton, grid_position, 0)
         pushActivityButton.clicked.connect(self.gotoPushActivityScreen)
 
+        grid_position = grid_position + 1
         pushSubjectButton = QPushButton("Push subject")
-        self.gridbox.addWidget(pushSubjectButton, 5, 0)
+        self.gridbox.addWidget(pushSubjectButton, grid_position, 0)
         pushSubjectButton.clicked.connect(self.gotoPushSubjectScreen)
 
+        grid_position = grid_position + 1
         pushSubjectButton = QPushButton("Push day")
-        self.gridbox.addWidget(pushSubjectButton, 6, 0)
+        self.gridbox.addWidget(pushSubjectButton, grid_position, 0)
         pushSubjectButton.clicked.connect(self.gotoPushDayScreen)
 
         # Scroll Area Properties
@@ -392,6 +404,11 @@ class Ui_MainWindow(QMainWindow):
     def gotoEditScreen(self):
         editScreen = Ui_EditScreen()
         widget.addWidget(editScreen)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def gotoEditSubjectScreen(self):
+        editSubjectScreen = Ui_EditSubjectScreen()
+        widget.addWidget(editSubjectScreen)
         widget.setCurrentIndex(widget.count() - 1)
 
     def gotoSimultaneousScreen(self):
@@ -798,6 +815,87 @@ class Ui_EditScreen(QMainWindow):
         editAssignmentScreen = Ui_EditAssignmentScreen(
             self.assignmentSelected, widget.currentIndex())
         widget.addWidget(editAssignmentScreen)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def periodicCheckBoxClick(self, state):
+        self.new_assignment_periodic = state == Qt.Checked
+
+
+class Ui_EditSubjectScreen(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.scroll = QScrollArea()
+        self.widget = QWidget()
+        self.gridbox = QGridLayout()
+        self.widget.setLayout(self.gridbox)
+
+        # Categories
+        self.category_label = QLabel("School")
+        self.category_label.setFont(QFont('Arial', 16))
+        self.gridbox.addWidget(self.category_label, 0, 0)
+
+        self.category_label = QLabel("Personal")
+        self.category_label.setFont(QFont('Arial', 16))
+        self.gridbox.addWidget(self.category_label, 0, 1)
+
+        myFont = QFont()
+        myFont.setBold(True)
+
+        # Subjects
+        i = 1
+        for subject in school.get_subj_list():
+            self.subject_radio_button = QRadioButton(
+                subject.get_name())
+            self.subject_radio_button.toggled.connect(
+                self.selectSubject)
+            self.gridbox.addWidget(self.subject_radio_button, i, 0)
+            i += 1
+
+        i = 1
+        for subject in personal.get_categ_list():
+            self.subject_radio_button = QRadioButton(
+                subject.get_name())
+            self.subject_radio_button.toggled.connect(
+                self.selectSubject)
+            self.gridbox.addWidget(self.subject_radio_button, i, 1)
+            i += 1
+
+        # Buttons
+        self.editSubjectPushButton = QPushButton("Edit")
+        self.editSubjectPushButton.clicked.connect(
+            self.gotoEditParticularSubjectScreen)
+        self.gridbox.addWidget(self.editSubjectPushButton, 0, 2)
+
+        self.cancelPushButton = QPushButton("Cancel")
+        self.cancelPushButton.clicked.connect(self.gotoMainScreen)
+        self.gridbox.addWidget(self.cancelPushButton, 1, 2)
+
+        # Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
+
+        self.setCentralWidget(self.scroll)
+
+        self.setGeometry(600, 100, 1000, 900)
+        self.setWindowTitle('Organizer')
+
+    def gotoMainScreen(self):
+        mainWindow = Ui_MainWindow()
+        widget.addWidget(mainWindow)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def selectSubject(self):
+        btn = self.sender()
+        if btn.isChecked():
+            self.subjectSelected = btn.text()
+
+    def gotoEditParticularSubjectScreen(self):
+        editParticularSubjectScreen = Ui_EditParticularSubjectScreen(
+            self.subjectSelected, widget.currentIndex())
+        widget.addWidget(editParticularSubjectScreen)
         widget.setCurrentIndex(widget.count() - 1)
 
     def periodicCheckBoxClick(self, state):
@@ -1319,6 +1417,125 @@ class Ui_EditAssignmentScreen(QMainWindow):
         elif self.list == "Personal":
             del personal.get_categ_list()[self.subjectIndex].get_assignm_list()[
                 self.assignmentIndex]
+            save_in_personal_file()
+
+        # Set Main Window
+        mainWindow = Ui_MainWindow()
+        widget.addWidget(mainWindow)
+        widget.setCurrentIndex(widget.count() - 1)
+
+
+class Ui_EditParticularSubjectScreen(QMainWindow):
+
+    def __init__(self, subjectName, perviousScreenIndex):
+        super().__init__()
+
+        self.perviousScreenIndex = perviousScreenIndex
+
+        for subject in school.get_subj_list():
+            if subject.get_name() == subjectName:
+                self.subjectToEdit = subject
+                self.subjectIndex = school.get_subj_list().index(subject)
+                self.list = "School"
+        for subject in personal.get_categ_list():
+            if subject.get_name() == subjectName:
+                self.subjectToEdit = subject
+                self.subjectIndex = personal.get_categ_list().index(subject)
+                self.list = "Personal"
+
+        self.widget = QWidget()
+
+        # Form
+        self.form = QFormLayout()
+
+        # creating the form
+        self.subjectNameLineEdit = QLineEdit()  # Subject name
+        self.subjectNameLineEdit.setText(
+            self.subjectToEdit.get_name())
+        self.form.addRow(QLabel("Subject name"),
+                         self.subjectNameLineEdit)
+
+        colors = ["lightblue", "lightgrey", "azure",
+                  "beige", "lightgoldenrodyellow", "bisque",
+                  "gold", "honeydew", "khaki", "lavender",
+                  "lavenderblush", "lemonchiffon", "lightcoral",
+                  "lightcyan", "lightgoldenrodyellow", "lightpink",
+                  "lightsalmon", "lightseagreen", "lightskyblue",
+                  "lightsteelblue", "lightyellow", "lime", "linen",
+                  "magenta", "mediumorchid", "mediumseagreen",
+                  "mediumspringgreen", "mediumslateblue",
+                  "mintcream", "orange", "palegreen", "plum"]
+        self.colorStringComboBox = QComboBox()  # color
+        self.colorStringComboBox.addItems(colors)
+        self.colorStringComboBoxLabel = QLabel("Category color")
+        self.colorStringComboBox.currentTextChanged.connect(
+            self.onColorStringComboboxChanged)
+        self.form.addRow(self.colorStringComboBoxLabel,
+                         self.colorStringComboBox)
+
+        index = self.colorStringComboBox.findText(
+            self.subjectToEdit.get_color_string(), Qt.MatchFixedString)
+
+        if index >= 0:
+            self.colorStringComboBox.setCurrentIndex(index)
+        self.colorStringComboBoxLabel.setStyleSheet(
+            "background-color: " + self.colorStringComboBox.currentText())
+
+        self.removePushButton = QPushButton("Remove")
+        self.removePushButton.clicked.connect(self.removeSubject)
+        self.removePushButton.setStyleSheet(
+            'QPushButton {color: red;}')
+
+        self.form.addRow(self.removePushButton)
+
+        self.formGroupBox = QGroupBox("Edit subject")
+        self.formGroupBox.setLayout(self.form)
+
+        self.buttonBox = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.buttonBox.accepted.connect(self.saveValues)
+        self.buttonBox.rejected.connect(self.goBack)
+
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(self.formGroupBox)
+        mainLayout.addWidget(self.buttonBox)
+
+        self.widget.setLayout(mainLayout)
+
+        self.setCentralWidget(self.widget)
+
+        self.setGeometry(600, 100, 1000, 900)
+        self.setWindowTitle('Organizer')
+
+    def onColorStringComboboxChanged(self, value):
+        # newColor = self.colorStringComboBox.currentText()
+        self.colorStringComboBoxLabel.setStyleSheet(
+            "background-color: " + value)
+
+    def saveValues(self):
+
+        subject_name = self.subjectNameLineEdit.text()
+
+        if self.list == "School":
+            school.get_subj_list()[self.subjectIndex].set_name(subject_name)
+            save_in_school_file()
+        elif self.list == "Personal":
+            personal.get_categ_list()[self.subjectIndex].set_name(subject_name)
+            save_in_personal_file()
+
+        mainWindow = Ui_MainWindow()
+        widget.addWidget(mainWindow)
+        widget.setCurrentIndex(widget.count() - 1)
+
+    def goBack(self):
+        widget.setCurrentIndex(self.perviousScreenIndex)
+
+    def removeSubject(self):
+        if self.list == "School":
+            del school.get_subj_list()[self.subjectIndex]
+            save_in_school_file()
+        elif self.list == "Personal":
+            del personal.get_categ_list()[self.subjectIndex]
             save_in_personal_file()
 
         # Set Main Window
