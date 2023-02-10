@@ -1553,6 +1553,13 @@ today = dt.datetime.today()
 #         assignment.set_color_string("lightgrey")
 # save_in_personal_file()
 
+# Print something from assignments
+# for category in school.get_subj_list() + personal.get_categ_list():
+#     for assignment in category.get_assignm_list():
+#         if isinstance(assignment, PersAssignmentPeriodic):
+#             print(assignment.get_name() + ": " +
+#                   str(assignment.get_start_time()))
+
 # TODO: display one assignment
 # TODO: clean up code
 # TODO: display difference in instruction now

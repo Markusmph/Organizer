@@ -7,6 +7,7 @@ from datetime import *
 import math
 import pickle as pk
 import pandas as pd
+import time as t
 
 from Classes.Ambits import Ambit, School, Subject, Natma, Personal, Category
 from Classes.Assignments import Assignment, Homework, Exam, PersAssignment, PersAssignmentPeriodic
@@ -1833,21 +1834,21 @@ class Ui_PushActivityScreen(QMainWindow):
                     self.gridbox.addWidget(
                         self.assignmentRadioButton, i, 0)
                     # Start time
-                    if isinstance(assignment, PersAssignmentPeriodic):
+                    if isinstance(assignment, PersAssignmentPeriodic) and assignment.get_periodic_type() == 0:
                         index = int(day.strftime("%d")) - \
                             int(datetime.today().strftime("%d"))
-                        self.assignmentStartTimeLabel = QLabel(
-                            assignment.get_start_time()[index].strftime("%H:%M"))
+                        # self.assignmentStartTimeLabel = QLabel(
+                        #     assignment.get_start_time()[index].strftime("%H:%M"))
                         self.assignmentDurationLabel = QLabel(
                             str(assignment.get_time_to_finish(index)))
-                    else:
-                        self.assignmentStartTimeLabel = QLabel(
-                            assignment.get_start_time().strftime("%H:%M"))
-                        self.assignmentDurationLabel = QLabel(
-                            str(assignment.get_time_to_finish()))
-                    self.gridbox.addWidget(
-                        self.assignmentStartTimeLabel, i, 1)
-                    # Duration
+                    # else:
+                        # self.assignmentStartTimeLabel = QLabel(
+                        #     assignment.get_start_time().strftime("%H:%M"))
+                        # self.assignmentDurationLabel = QLabel(
+                        #     str(assignment.get_time_to_finish()))
+                        # self.gridbox.addWidget(
+                        #     self.assignmentStartTimeLabel, i, 1)
+                        # Duration
                     self.gridbox.addWidget(
                         self.assignmentDurationLabel, i, 2)
                     i += 1
@@ -1877,11 +1878,14 @@ class Ui_PushActivityScreen(QMainWindow):
 
     def pushAssignment(self):
         # 0 Get selected assignment
+        start_time = t.time()
         for assignment in self.assignments:
             if self.assignmentSelectedText == assignment.get_name():
                 self.assignmentSelected = assignment
+        print(f"Get selected assignment: {t.time() - start_time}")
 
         # 1 Get index in the used matrix of the delivery of the assignment and the time blocks of the assignment
+        start_time = t.time()
         startHourIndex = getTimeIndex(self.assignmentSelected.get_start_time())
         timeBlocks = round(self.assignmentSelected.get_time_to_finish() / 0.5)
 
@@ -1894,42 +1898,26 @@ class Ui_PushActivityScreen(QMainWindow):
         dayDifference = date1 - date2
 
         dayIndex = dayDifference.days
+        print(
+            f"Get index in the used matrix of the delivery of the assignment and the time blocks of the assignment: {t.time() - start_time}")
 
         # 2 Loop through each cell counting the number of continuous free spots
+        start_time = t.time()
+        # Set variables to be used
         freeSpotAvailable = False
         currentBlockCount = 0
         hourIndex = startHourIndex
+        # Start loop
         while not freeSpotAvailable:
-            if hourIndex + timeBlocks < len(self.usedMatrix):
-                if not self.usedMatrix[hourIndex + timeBlocks][dayIndex]:
-                    currentBlockCount += 1
-                    # 3 If the number of free spots matches the amount of 30 minutes blocks of the time remaining for the assingment, set the delivery date to that
-                    if currentBlockCount == timeBlocks:  # Check if it is possible to put the assignment here
-                        newStartTime = getTimeFromTimeIndex(hourIndex + 1)
-                        newDeliveryDate = date.today() + timedelta(days=dayIndex)
-                        for assignment in self.assignments:
-                            if self.assignmentSelectedText == assignment.get_name():
-                                assignment.set_delivery_date(newDeliveryDate)
-                                assignment.set_start_time(newStartTime)
-                                freeSpotAvailable = True
-                                save_in_personal_file()
-                                save_in_school_file()
-                                break
+            if not self.usedMatrix[hourIndex + timeBlocks][dayIndex]:
+                currentBlockCount += 1
+                # 3 If the number of free spots matches the amount of 30 minutes blocks of the time remaining for the assingment, set the delivery date to that
+                if currentBlockCount == timeBlocks:  # Check if it is possible to put the assignment here
+                    newStartTime = getTimeFromTimeIndex(hourIndex + 1)
+                    newDeliveryDate = date.today() + timedelta(days=dayIndex)
+                    break
 
-                    else:  # Assignment does not fit yet
-                        if hourIndex + timeBlocks + 1 < len(self.usedMatrix):
-                            hourIndex += 1
-                        else:
-                            if dayIndex + 1 < len(self.usedMatrix[0]):
-                                hourIndex = -timeBlocks
-                                dayIndex += 1
-                            else:
-                                print(
-                                    "There is no space available inside the used matrix space")
-                                freeSpotAvailable = True
-
-                else:
-                    currentBlockCount = 0
+                else:  # Assignment does not fit yet
                     if hourIndex + timeBlocks + 1 < len(self.usedMatrix):
                         hourIndex += 1
                     else:
@@ -1942,26 +1930,44 @@ class Ui_PushActivityScreen(QMainWindow):
                             freeSpotAvailable = True
 
             else:
-                if dayIndex + 1 < len(self.usedMatrix[0]):
-                    hourIndex = -timeBlocks
-                    dayIndex += 1
+                currentBlockCount = 0
+                if hourIndex + timeBlocks + 1 < len(self.usedMatrix):
+                    hourIndex += 1
                 else:
-                    print("There is no space available inside the used matrix space")
-                    freeSpotAvailable = True
+                    if dayIndex + 1 < len(self.usedMatrix[0]):
+                        hourIndex = -timeBlocks
+                        dayIndex += 1
+                    else:
+                        print(
+                            "There is no space available inside the used matrix space")
+                        freeSpotAvailable = True
+        print(
+            f"Loop through each cell counting the number of continuous free spots: {t.time() - start_time}")
 
-            self.gotoMainScreen()
+        # 3 Assign new date and start times and go to main screen
+        start_time = t.time()
+        for assignment in self.assignments:
+            if self.assignmentSelectedText == assignment.get_name():
+                assignment.set_delivery_date(newDeliveryDate)
+                assignment.set_start_time(newStartTime)
+                save_in_personal_file()
+                save_in_school_file()
+                break
+        self.gotoMainScreen()
+        print(
+            f"Assign new date and start times and go to main screen: {t.time() - start_time}")
 
-            # 4 Save everything
-            # 5 Goto main screen
+        # 4 Save everything
+        # 5 Goto main screen
 
-            ####### OLD PUSH INSTRUCTION ########
-            # for assignment in self.assignments:
-            #     if self.assignmentSelected == assignment.get_name():
-            #         assignment.set_delivery_date(
-            #             assignment.get_delivery_date() + timedelta(days=1))
-            # save_in_personal_file()
-            # save_in_school_file()
-            # self.gotoMainScreen()
+        ####### OLD PUSH INSTRUCTION ########
+        # for assignment in self.assignments:
+        #     if self.assignmentSelected == assignment.get_name():
+        #         assignment.set_delivery_date(
+        #             assignment.get_delivery_date() + timedelta(days=1))
+        # save_in_personal_file()
+        # save_in_school_file()
+        # self.gotoMainScreen()
 
     def selectAssignment(self):
         btn = self.sender()
