@@ -1839,8 +1839,8 @@ class Ui_PushActivityScreen(QMainWindow):
                             int(datetime.today().strftime("%d"))
                         # self.assignmentStartTimeLabel = QLabel(
                         #     assignment.get_start_time()[index].strftime("%H:%M"))
-                        self.assignmentDurationLabel = QLabel(
-                            str(assignment.get_time_to_finish(index)))
+                        # self.assignmentDurationLabel = QLabel(
+                        #     str(assignment.get_time_to_finish(index)))
                     # else:
                         # self.assignmentStartTimeLabel = QLabel(
                         #     assignment.get_start_time().strftime("%H:%M"))
@@ -1849,8 +1849,8 @@ class Ui_PushActivityScreen(QMainWindow):
                         # self.gridbox.addWidget(
                         #     self.assignmentStartTimeLabel, i, 1)
                         # Duration
-                    self.gridbox.addWidget(
-                        self.assignmentDurationLabel, i, 2)
+                    # self.gridbox.addWidget(
+                    #     self.assignmentDurationLabel, i, 2)
                     i += 1
 
         # Buttons
