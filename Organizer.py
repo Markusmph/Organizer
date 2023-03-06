@@ -1557,8 +1557,16 @@ today = dt.datetime.today()
 # for category in school.get_subj_list() + personal.get_categ_list():
 #     for assignment in category.get_assignm_list():
 #         if isinstance(assignment, PersAssignmentPeriodic):
-#             print(assignment.get_name() + ": " +
-#                   str(assignment.get_start_time()))
+#             print(assignment.get_name())
+#             # print(assignment.get_name() + ": " +
+#             #       str(assignment.get_start_time()))
+
+# Borrar assignment
+# print("Deliting " + personal.get_categ_list()
+#       [5].get_assignm_list()[5].get_name())
+# del personal.get_categ_list()[5].get_assignm_list()[5]
+# save_in_personal_file()
+
 
 # TODO: display one assignment
 # TODO: clean up code
