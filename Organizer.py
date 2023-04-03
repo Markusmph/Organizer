@@ -1556,15 +1556,22 @@ today = dt.datetime.today()
 # Print something from assignments
 # for category in school.get_subj_list() + personal.get_categ_list():
 #     for assignment in category.get_assignm_list():
-#         if isinstance(assignment, PersAssignmentPeriodic):
+#         if assignment.get_name() == "Pasar conversaciones WA":
 #             print(assignment.get_name())
-#             # print(assignment.get_name() + ": " +
-#             #       str(assignment.get_start_time()))
+#             print(assignment.get_start_time_hours_int())
+#             print(type(assignment))
+#             print(assignment.get_periodic_type())
+# if isinstance(assignment, PersAssignmentPeriodic):
+#     print(assignment.get_name())
+# print(assignment.get_name() + ": " +
+#       str(assignment.get_start_time()))
 
-# Borrar assignment
+# Borrar personal assignment
+# categ_index = 5
+# assignm_index = 0
 # print("Deliting " + personal.get_categ_list()
-#       [5].get_assignm_list()[5].get_name())
-# del personal.get_categ_list()[5].get_assignm_list()[5]
+#       [categ_index].get_assignm_list()[assignm_index].get_name())
+# del personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index]
 # save_in_personal_file()
 
 
