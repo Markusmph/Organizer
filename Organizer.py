@@ -1567,8 +1567,19 @@ today = dt.datetime.today()
 #       str(assignment.get_start_time()))
 
 # Borrar personal assignment
-# categ_index = 5
-# assignm_index = 0
+# categ_index = 7
+# assignm_index = 7
+# print(personal.get_categ_list()[7].get_name())
+# print(personal.get_categ_list()[7].get_assignm_list()[7].get_name())
+# for category in personal.get_categ_list():
+#     print("     cat name: " + category.get_name())
+#     for assignment in category.get_assignm_list():
+#         print(assignment.get_name())
+# if assignment.get_name() == "Pasar conversaciones WA":
+#     print(assignment.get_name())
+#     print(assignment.get_start_time_hours_int())
+#     print(type(assignment))
+#     print(assignment.get_periodic_type())
 # print("Deliting " + personal.get_categ_list()
 #       [categ_index].get_assignm_list()[assignm_index].get_name())
 # del personal.get_categ_list()[categ_index].get_assignm_list()[assignm_index]
