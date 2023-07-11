@@ -174,7 +174,10 @@ class PersAssignment(Assignment):
         return 100 - self.perc_completed
 
     def get_time_to_finish(self):
-        return ((100 - self.perc_completed)/self.perc_in_1hr)
+        try:
+            return ((100 - self.perc_completed)/self.perc_in_1hr)
+        except ZeroDivisionError:
+            return 0
 
     def get_mandatory(self):
         return self.mandatory
