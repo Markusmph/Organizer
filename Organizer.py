@@ -1577,15 +1577,16 @@ today = dt.datetime.today()
 #     print(assignment.get_name())
 
 
-# for category in personal.get_categ_list():
+# for category in school.get_subj_list():
 #     # print("     cat name: " + category.get_name())
 #     for assignment in category.get_assignm_list():
 #         # print(assignment.get_name())
-#         if assignment.get_name() == "Descanso":
+#         if assignment.get_name() == "Hola":
 #             print(assignment.get_name())
 #             print(assignment.get_start_time_hours_int())
 #             print(type(assignment))
 #             print(assignment.get_periodic_type())
+#             print(assignment.get_start_time())
 # categ_index = 2
 # assignm_index = 20
 # print("Deliting " + personal.get_categ_list()

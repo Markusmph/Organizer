@@ -337,6 +337,8 @@ class PersAssignmentPeriodic(Assignment):
             return ((100 - self.perc_completed[i])/self.perc_in_1hr[i])
         except ZeroDivisionError:
             return 0
+        except TypeError:
+            return (100/self.perc_in_1hr[i])
 
     def get_weekly_periodic_day_int(self):
         return self.weekly_periodic_day_int
@@ -374,7 +376,7 @@ class PersAssignmentPeriodic(Assignment):
             print("No weekly_start_times. Creating...")
             self.weekly_start_times = []
             for i in range(7):
-                self.weekly_start_times.append(self.get_start_time())
+                self.weekly_start_times.append(self.get_start_time()[0])
             for i in range(7):
                 self.weekly_start_times_minutes_int.append(
                     int(self.weekly_start_times[i].strftime("%M")))
