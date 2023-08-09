@@ -338,7 +338,10 @@ class PersAssignmentPeriodic(Assignment):
         except ZeroDivisionError:
             return 0
         except TypeError:
-            return (100/self.perc_in_1hr[i])
+            try:
+                return (100/self.perc_in_1hr[i])
+            except ZeroDivisionError:
+                return 0
 
     def get_weekly_periodic_day_int(self):
         return self.weekly_periodic_day_int
