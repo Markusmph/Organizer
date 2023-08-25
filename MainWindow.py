@@ -69,6 +69,12 @@ def update_assignments():
                         start_times.append(new_start_time)
                         school.get_subj_list()[subject_index].get_assignm_list()[
                             assignment_index].set_start_time(start_times)
+                        # p1hr
+                        p1hrList = school.get_subj_list()[subject_index].get_assignm_list()[
+                            assignment_index].get_perc_in1hr()
+                        p1hrList.append(p1hrList.pop(0))
+                        school.get_subj_list()[subject_index].get_assignm_list()[
+                            assignment_index].set_perc_in1hr(p1hrList)
                 save_in_school_file()
 
     # Personal
