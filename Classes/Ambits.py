@@ -78,11 +78,17 @@ class Subject:
         self.assignm_list.append(new_assignm)
         print("Ambits msg: Assignment added to " + self.name)
 
+    def set_name(self, name):
+        self.name = name
+
     def set_assignm_list(self, assignm_list):
         self.assignm_list = assignm_list
 
     def set_color_string(self, colorString):
         self.colorString = colorString
+        if len(self.assignm_list) > 0:
+            for assignm in self.assignm_list:
+                assignm.set_color_string(self.colorString)
 
     def remove_assignm(self, index):
         pass
@@ -139,6 +145,9 @@ class Category:
 
     def set_color_string(self, colorString):
         self.colorString = colorString
+        if len(self.assignm_list) > 0:
+            for assignm in self.assignm_list:
+                assignm.set_color_string(self.colorString)
 
     def get_name(self):
         return self.name

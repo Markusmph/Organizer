@@ -1522,12 +1522,15 @@ class Ui_EditParticularSubjectScreen(QMainWindow):
     def saveValues(self):
 
         subject_name = self.subjectNameLineEdit.text()
+        colorString = str(self.colorStringComboBox.currentText())
 
         if self.list == "School":
             school.get_subj_list()[self.subjectIndex].set_name(subject_name)
+            school.get_subj_list()[self.subjectIndex].set_color_string(colorString)
             save_in_school_file()
         elif self.list == "Personal":
             personal.get_categ_list()[self.subjectIndex].set_name(subject_name)
+            personal.get_categ_list()[self.subjectIndex].set_color_string(colorString)
             save_in_personal_file()
 
         mainWindow = Ui_MainWindow()
